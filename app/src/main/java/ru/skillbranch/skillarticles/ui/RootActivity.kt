@@ -2,7 +2,10 @@ package ru.skillbranch.skillarticles.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
+import android.view.Menu
 import android.widget.ImageView
+import android.widget.SearchView
 import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProviders
@@ -40,6 +43,45 @@ class RootActivity : AppCompatActivity() {
         /*switch_mode.setOnClickListener {
             delegate.localNightMode = if(switch_mode.isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         }*/
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        val content = viewModel.currentState
+        menuInflater.inflate(R.menu.search_menu, menu)
+        val actionSearch = menu?.findItem(R.id.action_search)
+        val searchView = actionSearch?.actionView as SearchView
+        searchView.inputType = InputType.TYPE_CLASS_TEXT
+
+        if (!content.searchQuery.isNullOrEmpty() || content.isSearch) {
+            actionSearch.expandActionView()
+            if (!content.searchQuery.isNullOrEmpty()) {
+                searchView.setQuery(content.searchQuery, false)
+            }
+            if (content.isSearch) {
+                searchView.requestFocus()
+            } else {
+                searchView.clearFocus()
+            }
+        }
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.handleSearch(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                viewModel.handleSearch(newText)
+                return true
+            }
+        })
+
+        searchView.setOnQueryTextFocusChangeListener { view, isSearch ->
+            viewModel.handleSearchMode(isSearch)
+        }
+
+        return super.onCreateOptionsMenu(menu)
+
     }
 
     private fun renderNotification(notify: Notify) {
