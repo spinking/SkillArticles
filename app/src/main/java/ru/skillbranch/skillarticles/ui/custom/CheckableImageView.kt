@@ -10,7 +10,7 @@ class CheckableImageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ImageView(context, attrs, defStyleAttr), Checkable, View.OnClickListener {
+) : ImageView(context, attrs, defStyleAttr), Checkable, View.OnClickListener{
     private var checked = false
 
     companion object {
@@ -22,7 +22,7 @@ class CheckableImageView @JvmOverloads constructor(
     }
 
     override fun onCreateDrawableState(extraSpace: Int): IntArray {
-        val drawableState = super.onCreateDrawableState(extraSpace + 1)
+        val drawableState =  super.onCreateDrawableState(extraSpace + 1)
         if(isChecked) View.mergeDrawableStates(drawableState, CHECKED_STATE_SET)
         return drawableState
     }
@@ -30,7 +30,7 @@ class CheckableImageView @JvmOverloads constructor(
     override fun isChecked(): Boolean = checked
 
     override fun toggle() {
-        checked = checked.not()
+        isChecked = !checked
     }
 
     override fun setChecked(check: Boolean) {
@@ -39,7 +39,9 @@ class CheckableImageView @JvmOverloads constructor(
         refreshDrawableState()
     }
 
-    override fun onClick(p0: View?) {
+    override fun onClick(v: View?) {
         toggle()
     }
+
+
 }
