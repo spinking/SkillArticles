@@ -97,7 +97,23 @@ class ArticleViewModel(
     }
 
     fun handleBookmark() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val toggleBookmark = {
+            val info = currentState.toArticlePersonalInfo()
+            repository.updateArticlePersonalInfo(info.copy(isBookmark = !info.isBookmark))
+        }
+
+        toggleBookmark()
+
+        val msg = if(currentState.isBookmark) {
+            Notify.TextMessage("Bookmark is pressed")
+        } else {
+            Notify.ActionMessage(
+                "Don't pressed it anymore",
+                "No, still press it",
+                toggleBookmark
+            )
+        }
+        notify(msg)
     }
 
     fun handleShare() {
