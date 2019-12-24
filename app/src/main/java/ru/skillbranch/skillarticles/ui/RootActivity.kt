@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.text.InputType
 import android.view.Menu
 import android.widget.ImageView
-import android.widget.SearchView
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
@@ -27,9 +27,9 @@ class RootActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_root)
-        setupToolbar()
         setupBottombar()
         setupSubmenu()
+        setupToolbar()
 
         val vmFactory = ViewModelFactory("0")
         viewModel = ViewModelProviders.of(this, vmFactory).get(ArticleViewModel::class.java)

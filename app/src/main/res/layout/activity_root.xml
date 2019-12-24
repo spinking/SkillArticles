@@ -15,9 +15,11 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
+            android:theme="@style/ArticleBarsTheme"
+            style="@style/ArticleToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:logo="@drawable/logo"
+            app:logo="@drawable/logo_placeholder"
             app:title="@string/app_name"
             app:subtitle="loading..."
             app:layout_scrollFlags="scroll|enterAlwaysCollapsed"

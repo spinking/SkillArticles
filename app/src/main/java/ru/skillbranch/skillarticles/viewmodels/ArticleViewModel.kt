@@ -132,11 +132,11 @@ class ArticleViewModel(
     }
 
     override fun handleSearchMode(isSearch: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        updateState { it.copy(isSearch = isSearch) }
     }
 
     override fun handleSearch(query: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        updateState { it.copy(searchQuery = query) }
     }
 }
 
