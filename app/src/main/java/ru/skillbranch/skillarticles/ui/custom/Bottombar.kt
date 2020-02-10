@@ -57,7 +57,7 @@ class Bottombar @JvmOverloads constructor(
     }
 
     private fun animateHideSearchPanel() {
-        group_bottom.isVisible = false
+        group_bottom.isVisible = true
         val endRadius = hypot(width.toFloat(), height / 2f)
         val va = ViewAnimationUtils.createCircularReveal(
             reveal,
@@ -71,7 +71,7 @@ class Bottombar @JvmOverloads constructor(
     }
 
     private fun animateShowSearchPanel() {
-        reveal.isVisible = false
+        reveal.isVisible = true
         val endRadius = hypot(width.toFloat(), height/2f)
         val va = ViewAnimationUtils.createCircularReveal(
             reveal,
@@ -82,6 +82,22 @@ class Bottombar @JvmOverloads constructor(
         )
         va.doOnEnd { group_bottom.isVisible = false }
         va.start()
+    }
+
+    fun bindSearchInfo(searchCount: Int = 0, position: Int = 0) {
+        if(searchCount == 0) {
+            tv_search_result.text = "Not found"
+            btn_result_up.isEnabled = false
+            btn_result_down.isEnabled = false
+        } else {
+            tv_search_result.text = "${position.inc()} of $searchCount"
+            btn_result_up.isEnabled = true
+            btn_result_down.isEnabled = true
+        }
+        when(position) {
+            0 -> btn_result_up.isEnabled = false
+            searchCount - 1 -> btn_result_down.isEnabled = false
+        }
     }
 
     private class SavedState : BaseSavedState, Parcelable {
