@@ -265,28 +265,28 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
         private var searchResults: List<Pair<Int, Int>> by ObserveProp(emptyList())
         private var searchPosition: Int by ObserveProp(0)
-        private var content: String By ObserveProp('loading') {
-            tv_text_content.apply {
-                setText(it, TextView.BufferType.SPANNABLE)
-                movementMethod = ScrollingMovementMethod()
-            }
+        private var content: String by ObserveProp("loading") {
+            tv_text_content.setText(it, TextView.BufferType.SPANNABLE)
+            tv_text_content.movementMethod = ScrollingMovementMethod()
         }
 
         override fun onFinishInflate() {
-            dependsOn(
+            dependsOn<Boolean, Boolean, List<Pair<Int, Int>>, Int>(
                 ::isLoadingContent,
                 ::isSearch,
                 ::searchResults,
                 ::searchPosition
             ) { ilc, iss, sr, sp ->
-                if(!ilc && iss) {
+                if(!ilc && iss){
                     renderSearchResult(sr)
                     renderSearchPosition(sp)
                 }
-                if(!ilc && !iss) {
+                if(!ilc && !iss){
                     clearSearchResult()
                 }
+
                 bottombar.bindSearchInfo(sr.size, sp)
+
             }
         }
 

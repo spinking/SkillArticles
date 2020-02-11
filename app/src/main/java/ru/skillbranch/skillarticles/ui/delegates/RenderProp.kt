@@ -37,7 +37,7 @@ class ObserveProp<T : Any>(
     private val onChange: ((T) -> Unit)? = null
 ) {
     //provide delegate (when by call)
-    operator fun providerDelegate(
+    operator fun provideDelegate(
         thisRef: Binding,
         prop: KProperty<*>
     ) : ReadWriteProperty<Binding, T> {
