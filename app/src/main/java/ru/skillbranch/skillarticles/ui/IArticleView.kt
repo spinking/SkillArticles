@@ -1,5 +1,7 @@
 package ru.skillbranch.skillarticles.ui
 
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
+
 interface IArticleView {
     /**
      * отрисовать все вхождения поискового запрос в контент (spannable)
@@ -24,4 +26,6 @@ interface IArticleView {
      * скрыть searchbar
      */
     fun hideSearchBar()
+
+    fun renderNotification(notify: Notify)
 }

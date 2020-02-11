@@ -1,13 +1,14 @@
 package ru.skillbranch.skillarticles.ui.base
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 
 abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatActivity() {
     protected abstract val binding: Binding
-    protected abstract var viewModel: T
+    protected abstract val viewModel: T
     protected abstract val layout: Int
 
     //set listeners, tuning views
@@ -17,5 +18,17 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
         super.onCreate(savedInstanceState)
         setContentView(layout)
         setupViews()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.saveState(outState)
+        binding.saveUi(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        viewModel.restoreState(savedInstanceState)
+        binding.restoreUi(savedInstanceState)
     }
 }
