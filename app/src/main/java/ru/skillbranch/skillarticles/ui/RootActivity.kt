@@ -296,10 +296,20 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
             isLike = data.isLike
             isBookmark = data.isBookmark
             isShowMenu = data.isShowMenu
+            isBigText = data.isBigText
+            isDarkMode = data.isDarkMode
 
             if(data.title != null) title = data.title
             if(data.category != null) category = data.category
             if(data.categoryIcon != null) categoryIcon = data.categoryIcon as Int
+            if(data.content.isNotEmpty()) content = data.content.first() as String
+
+            isLoadingContent = data.isLoadingContent
+            isSearch = data.isSearch
+            searchQuery = data.searchQuery
+            searchPosition = data.searchPosition
+            searchResults = data.searchResults
+
         }
 
         override fun saveUi(outState: Bundle) {
