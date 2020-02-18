@@ -1,3 +1,4 @@
+/*
 package ru.skillbranch.skillarticles.markdown.span
 
 import android.graphics.Canvas
@@ -140,4 +141,4 @@ class HeaderSpan constructor(
         drawLine(0f, bottom + 0f, width + 0f, bottom + 0f, Paint().apply { color = Color.GREEN })
         drawLine(0f, lineBaseline + 0f, width + 0f, lineBaseline + 0f, Paint().apply { color = Color.RED })
     }
-}
+}*/
