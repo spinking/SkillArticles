@@ -63,29 +63,27 @@ class ExampleUnitTest {
         val result = MarkdownParser.parse(combineEmphasisString)
         val actualItalic= prepare<Element.Italic>(result.elements)
         val actualBold= prepare<Element.Bold>(result.elements)
-       // val actualStrike= prepare<Element.Strike>(result.elements)
+        val actualStrike= prepare<Element.Strike>(result.elements)
         assertEquals(expectedCombine["italic"], actualItalic)
         assertEquals(expectedCombine["bold"], actualBold)
-        //assertEquals(expectedCombine["strike"], actualStrike)
+        assertEquals(expectedCombine["strike"], actualStrike)
     }
 
-/*    @Test
+    @Test
     fun parse_rule() {
         val result = MarkdownParser.parse(ruleString)
         val actual = prepare<Element.Rule>(result.elements)
         assertEquals(3, actual.size)
-    }*/
+    }
 
-/*
     @Test
     fun parse_inline_code() {
         val result = MarkdownParser.parse(inlineString)
         val actual = prepare<Element.InlineCode>(result.elements)
         assertEquals(expectedInline, actual)
     }
-*/
 
-/*    @Test
+    @Test
     fun parse_link() {
         val result = MarkdownParser.parse(linkString)
         val actual = prepare<Element.Link>(result.elements)
@@ -95,9 +93,9 @@ class ExampleUnitTest {
 
         assertEquals(expectedLink["titles"], actual)
         assertEquals(expectedLink["links"], actualLink)
-    }*/
+    }
 
-/*    @Test
+    @Test
     fun parse_all() {
         val result = MarkdownParser.parse(markdownString)
         val actualUnorderedList = prepare<Element.UnorderedListItem>(result.elements)
@@ -123,24 +121,24 @@ class ExampleUnitTest {
         assertEquals(expectedMarkdown["inline"], actualInline)
         assertEquals(expectedMarkdown["linkTitles"], actualLinkTitles)
         assertEquals(expectedMarkdown["links"], actualLinks)
-    }*/
+    }
 
-/*    @Test
+    @Test
     fun clear_all() {
         val result = MarkdownParser.clear(markdownString)
         assertEquals(markdownClearString,  result)
-    }*/
+    }
 
     //optionally (delete @Ignore fo run)
-/*    @Ignore
+    @Ignore
     @Test
     fun clear_all_with_optionally() {
         val result = MarkdownParser.clear(markdownString)
         assertEquals(markdownOptionallyClearString,  result)
-    }*/
+    }
 
     //optionally (delete @Ignore fo run)
-/*    @Ignore
+    @Ignore
     @Test
     fun parse_all_with_optionally() {
         val result = MarkdownParser.parse(markdownString)
@@ -171,7 +169,7 @@ class ExampleUnitTest {
         assertEquals(expectedMarkdown["links"], actualLinks)
         assertEquals(expectedMarkdown["multiline"], actualBlockCode) //optionally
         assertEquals(expectedMarkdown["orderedList"], actualOrderedList) //optionally
-    }*/
+    }
 
 
 
