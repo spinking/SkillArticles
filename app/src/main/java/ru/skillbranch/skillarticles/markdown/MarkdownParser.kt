@@ -140,28 +140,57 @@ object MarkdownParser {
                 //RULE
                 7 -> {
                     //text without "***" insert empty character
-                    //TODO implement me
+                    val element = Element.Rule()
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
 
                 //RULE
                 8 -> {
                     //text without "`{}`"
-                    //TODO implement me
+                    text = string.subSequence(startIndex.inc(), endIndex.dec())
+
+                    val element = Element.InlineCode(text)
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
 
                 //LINK
                 9 -> {
                     //full text for regex
-                    //TODO implement me
+                    text = string.subSequence(startIndex,endIndex)
+                    val (title:String, link:String) = "\\[(.*)]\\((.*)\\)".toRegex().find(text)!!.destructured
+                    val element = Element.Link(link, title)
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
                 //10 -> BLOCK CODE - optionally
                 10 -> {
-                    //TODO implement me
+                    text = string.subSequence(startIndex.plus(3),endIndex.plus(-3))
+                    if(text.contains(LINE_SEPARATOR)) {
+                        for((index, line) in text.lines().withIndex()) {
+                            when(index) {
+                                text.lines().lastIndex -> parents.add(Element.BlockCode(Element.BlockCode.Type.END, line))
+                                0 -> parents.add(Element.BlockCode(Element.BlockCode.Type.START, line + LINE_SEPARATOR))
+                                else -> {
+                                    parents.add(Element.BlockCode(Element.BlockCode.Type.MIDDLE, line + LINE_SEPARATOR))
+                                }
+                            }
+                        }
+                    } else {
+                        parents.add(Element.BlockCode(Element.BlockCode.Type.SINGLE, text))
+                    }
+                    lastStartIndex = endIndex
                 }
 
                 //11 -> NUMERIC LIST
                 11 -> {
-                    //TODO implement me
+                    val reg = "(^\\d{1,2}.)".toRegex().find(string.substring(startIndex, endIndex))
+                    val order = reg!!.value
+                    text = string.subSequence(startIndex.plus(order.length.inc()), endIndex).toString()
+                    val subString = findElements(text)
+                    parents.add(Element.OrderedListItem(order, text.toString(), subString))
+                    lastStartIndex = endIndex
                 }
             }
         }

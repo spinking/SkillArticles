@@ -2,52 +2,48 @@ package ru.skillbranch.skillarticles.markdown.spans
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.RectF
-import android.text.style.ReplacementSpan
+import android.text.Layout
+import android.text.style.LeadingMarginSpan
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
-import androidx.annotation.VisibleForTesting
-import ru.skillbranch.skillarticles.markdown.Element
 
 class UnorderedListSpan(
-    @ColorInt
-    private val textColor: Int,
-    @ColorInt
-    private val bgColor: Int,
     @Px
-    private val cornerRadius: Float,
+    private val gapWidth: Float,
     @Px
-    private val padding: Float,
-    private val type: Element.BlockCode.Type
-) : ReplacementSpan() {
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var rect = RectF()
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var path = Path()
+    private val bulletRadius: Float,
+    @ColorInt
+    private val bulletColor: Int
+) : LeadingMarginSpan {
 
-    override fun draw(
-        canvas: Canvas,
-        text: CharSequence?,
-        start: Int,
-        end: Int,
-        x: Float,
-        top: Int,
-        y: Int,
-        bottom: Int,
-        paint: Paint
-    ) {
-        //TODO implement me()
+    override fun getLeadingMargin(first: Boolean): Int {
+        return (4*bulletRadius +gapWidth).toInt()
     }
 
-    override fun getSize(
-        paint: Paint,
-        text: CharSequence?,
-        start: Int,
-        end: Int,
-        fm: Paint.FontMetricsInt?
-    ): Int {
-        //TODO implement me()
-        return 0
+    override fun drawLeadingMargin(
+        canvas: Canvas, paint: Paint, currentMarginLocation: Int, paragraphDirection: Int,
+        lineTop: Int, lineBaseline: Int, lineBottom: Int, text: CharSequence?, lineStart: Int,
+        lineEnd: Int, isFirstLine: Boolean, layout: Layout?
+    ) {
+        if(isFirstLine) {
+            paint.withCustomColor {
+                canvas.drawCircle(
+                    gapWidth + currentMarginLocation + bulletRadius,
+                    (lineTop + lineBottom)/2f,
+                    bulletRadius,
+                    paint)
+            }
+        }
+    }
+
+    private inline fun Paint.withCustomColor(block: () -> Unit) {
+        val oldColor = color
+        val oldStyle = style
+        color = bulletColor
+        style = Paint.Style.FILL
+        block()
+
+        color = oldColor
+        style = oldStyle
     }
 }
