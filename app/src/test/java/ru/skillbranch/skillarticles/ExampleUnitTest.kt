@@ -211,3 +211,4 @@ class ExampleUnitTest {
             .map { it.text.toString() } //transform to element text
     }
 }
+
