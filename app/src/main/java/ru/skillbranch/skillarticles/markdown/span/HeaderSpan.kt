@@ -1,4 +1,3 @@
-
 package ru.skillbranch.skillarticles.markdown.span
 
 import android.graphics.Canvas
