@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.markdown.span
+package ru.skillbranch.skillarticles.markdown.spans
 
 import android.graphics.*
 import android.text.style.ReplacementSpan
