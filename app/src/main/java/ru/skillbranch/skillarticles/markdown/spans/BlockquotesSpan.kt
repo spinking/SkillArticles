@@ -7,7 +7,7 @@ import android.text.style.LeadingMarginSpan
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 
-class BlockQuoteSpan(
+class BlockquotesSpan(
     @Px
     private val gapWidth: Float,
     @Px
