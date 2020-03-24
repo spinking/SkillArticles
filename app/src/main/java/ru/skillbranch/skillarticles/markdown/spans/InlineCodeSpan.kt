@@ -80,6 +80,8 @@ class InlineCodeSpan(
         val oldColor = color
         val oldStyle = style
 
+        color = bgColor
+        style = Paint.Style.FILL
         block()
 
         color = oldColor
