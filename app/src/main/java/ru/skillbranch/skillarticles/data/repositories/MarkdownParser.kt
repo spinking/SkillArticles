@@ -248,36 +248,6 @@ object MarkdownParser {
                     text = string.subSequence(startIndex.plus(3), endIndex.minus(3)).toString()
                     val element = Element.BlockCode(text)
                     parents.add(element)
-
-                    /*if(text.contains(LINE_SEPARATOR)) {
-                        for((index, line) in text.lines().withIndex()) {
-                            when(index) {
-                                text.lines().lastIndex -> parents.add(
-                                    Element.BlockCode(
-                                        Element.BlockCode.Type.END,
-                                        line
-                                    )
-                                )
-                                0 -> parents.add(
-                                    Element.BlockCode(
-                                        Element.BlockCode.Type.START,
-                                        line + LINE_SEPARATOR
-                                    )
-                                )
-                                else -> parents.add(
-                                    Element.BlockCode(
-                                        Element.BlockCode.Type.MIDDLE,
-                                        line + LINE_SEPARATOR
-                                    )
-                                )
-                            }
-                        }
-                    } else parents.add(
-                        Element.BlockCode(
-                            Element.BlockCode.Type.SINGLE,
-                            text
-                        )
-                    )*/
                     lastStartIndex = endIndex
                 }
                 11 -> {
