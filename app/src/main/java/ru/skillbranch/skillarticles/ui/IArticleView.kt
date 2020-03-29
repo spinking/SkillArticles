@@ -3,20 +3,20 @@ package ru.skillbranch.skillarticles.ui
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 interface IArticleView {
-    /**
+/*    *//**
      * отрисовать все вхождения поискового запрос в контент (spannable)
-     */
+     *//*
     fun renderSearchResult(searchResult: List<Pair<Int, Int>>)
 
-    /**
+    *//**
      * отрисовать текущее положения поиска и перевести фокус на него (spannable)
-     */
+     *//*
     fun renderSearchPosition(searchPosition: Int)
 
-    /**
+    *//**
      * очистить результаты поиска (удалить все spannable)
-     */
-    fun clearSearchResult()
+     *//*
+    fun clearSearchResult()*/
 
     /**
      * показать search bar

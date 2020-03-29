@@ -7,7 +7,6 @@ import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
-import ru.skillbranch.skillarticles.data.repositories.MarkdownParser
 import ru.skillbranch.skillarticles.data.repositories.clearContent
 import ru.skillbranch.skillarticles.extensions.indexesOf
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
@@ -160,6 +159,10 @@ class ArticleViewModel(
 
     fun handleDownResult() {
         updateState { it.copy(searchPosition = it.searchPosition.inc()) }
+    }
+
+    fun handleCopyCode() {
+        notify(Notify.TextMessage("Code copy to clipboard"))
     }
 }
 
