@@ -22,6 +22,7 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.dpToPx
+import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
 import java.nio.charset.Charset
 import java.security.MessageDigest
 import kotlin.math.hypot

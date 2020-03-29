@@ -15,3 +15,7 @@ fun View.setMarginOptionally(left:Int = marginStart, top : Int = marginTop, righ
     }
     requestLayout()
 }
+
+fun View.setPaddingOptionally(left: Int = paddingStart, top: Int = paddingTop, right: Int = paddingEnd, bottom: Int = paddingBottom) {
+    setPadding(left, top, right, bottom)
+}
