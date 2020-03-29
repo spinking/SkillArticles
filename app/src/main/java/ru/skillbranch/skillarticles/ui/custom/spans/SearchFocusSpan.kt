@@ -1,3 +1,5 @@
 package ru.skillbranch.skillarticles.ui.custom.spans
 
-class SearchFocusSpan(private val fgColor: Int) : SearchSpan(fgColor)
+import android.graphics.Color
+
+class SearchFocusSpan : SearchSpan()
