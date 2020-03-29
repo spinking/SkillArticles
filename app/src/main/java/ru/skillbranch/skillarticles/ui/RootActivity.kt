@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.ui
 
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -225,6 +226,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         }
     }
 
+    @SuppressLint("ServiceCast")
     private fun setupCopyListener() {
         tv_text_content.setCopyListener { copy ->
             val clipboard = getSystemService(Context.CAMERA_SERVICE) as ClipboardManager
