@@ -3,13 +3,10 @@ package ru.skillbranch.skillarticles.ui.custom.markdown
 import android.view.View
 import android.widget.TextView
 import androidx.core.view.children
-import ru.skillbranch.skillarticles.data.repositories.MarkdownText
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.extensions.groupByBounds
 import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
 import kotlin.properties.Delegates
-
-package ru.skillbranch.skillarticles.ui.custom.markdown
-
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
