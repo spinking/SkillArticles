@@ -148,6 +148,9 @@ class MarkdownCodeView private constructor(
         val width = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
         measureChild(sv_scroll, widthMeasureSpec, heightMeasureSpec)
         measureChild(iv_copy, widthMeasureSpec, heightMeasureSpec)
+        usedHeight += sv_scroll.measuredHeight + paddingTop + paddingBottom
+
+        setMeasuredDimension(width, usedHeight)
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)

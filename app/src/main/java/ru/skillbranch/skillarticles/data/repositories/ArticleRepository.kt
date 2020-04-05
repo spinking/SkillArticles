@@ -8,7 +8,7 @@ object ArticleRepository {
     private val local = LocalDataHolder
     private val network = NetworkDataHolder
 
-    fun loadArticleContent(articleId: String): LiveData<List<MarkdownElement>> {
+    fun loadArticleContent(articleId: String): LiveData<List<MarkdownElement>?> {
         return Transformations.map(network.loadArticleContent(articleId)) {
             return@map if (it == null) null
             else MarkdownParser.parse(it)

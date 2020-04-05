@@ -71,7 +71,7 @@ class ArticleViewModel(
         )
     }
 
-    override fun getArticleContent(): LiveData<List<MarkdownElement>> {
+    override fun getArticleContent(): LiveData<List<MarkdownElement>?> {
         return repository.loadArticleContent(articleId)
     }
 

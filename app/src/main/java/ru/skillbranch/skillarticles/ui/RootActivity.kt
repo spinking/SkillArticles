@@ -32,6 +32,7 @@ import ru.skillbranch.skillarticles.extensions.hideKeyboard
 import ru.skillbranch.skillarticles.extensions.setMarginOptionally
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.ui.base.Binding
+import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownImageView
 import ru.skillbranch.skillarticles.ui.custom.spans.SearchFocusSpan
 import ru.skillbranch.skillarticles.ui.custom.spans.SearchSpan
 import ru.skillbranch.skillarticles.ui.delegates.AttrValue
@@ -100,6 +101,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         setupBottombar()
         setupSubmenu()
         setupToolbar()
+
     }
 
 /*    override fun renderSearchResult(searchResult: List<Pair<Int, Int>>) {
@@ -229,7 +231,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
     @SuppressLint("ServiceCast")
     private fun setupCopyListener() {
         tv_text_content.setCopyListener { copy ->
-            val clipboard = getSystemService(Context.CAMERA_SERVICE) as ClipboardManager
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Copied code", copy)
             clipboard.setPrimaryClip(clip)
             viewModel.handleCopyCode()
