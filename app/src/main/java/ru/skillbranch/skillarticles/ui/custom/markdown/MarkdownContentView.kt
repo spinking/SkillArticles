@@ -8,8 +8,12 @@ import ru.skillbranch.skillarticles.extensions.groupByBounds
 import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
 import kotlin.properties.Delegates
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.SparseArray
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 
 class MarkdownContentView @JvmOverloads constructor(
@@ -130,6 +134,32 @@ class MarkdownContentView @JvmOverloads constructor(
         }
     }
 
+    public override fun onSaveInstanceState(): Parcelable? {
+        val savedState = SavedState(super.onSaveInstanceState())
+        savedState.viewModelFlags = SparseArray()
+        children.forEach {view ->
+            when(view) {
+                is MarkdownCodeView -> savedState.viewModelFlags?.put(indexOfChild(view), view.getMode())
+                is MarkdownImageView -> savedState.viewModelFlags?.put(indexOfChild(view), view.tv_alt?.isVisible ?: false)
+            }
+        }
+        return savedState
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable) {
+        if(state is SavedState) {
+            super.onRestoreInstanceState(state.superState)
+            children.forEach {
+                when(it) {
+                    is MarkdownImageView -> it.tv_alt?.isVisible = state.viewModelFlags!!.get(indexOfChild(it))
+                    is MarkdownCodeView ->  it.setMode(state.viewModelFlags!!.get(indexOfChild(it)))
+                }
+            }
+        } else {
+            super.onRestoreInstanceState(state)
+        }
+    }
+
     fun renderSearchPosition(
         searchPosition: Pair<Int, Int>?
     ) {
@@ -156,5 +186,28 @@ class MarkdownContentView @JvmOverloads constructor(
     fun setCopyListener(listener: (String) -> Unit) {
         children.filterIsInstance<MarkdownCodeView>()
             .forEach { it.copyListener = listener }
+    }
+
+    internal class SavedState : BaseSavedState {
+        var viewModelFlags: SparseArray<Boolean>? = null
+
+        constructor(source: Parcel) : super(source) {
+            viewModelFlags = source.readSparseArray(javaClass.classLoader)
+        }
+
+        constructor(superState: Parcelable?) : super(superState)
+
+        override fun writeToParcel(out: Parcel, flags: Int) {
+            super.writeToParcel(out, flags)
+            out.writeSparseArray(viewModelFlags)
+        }
+        companion object {
+            @JvmField
+            val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
+                override fun createFromParcel(source: Parcel): SavedState = SavedState(source)
+
+                override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+            }
+        }
     }
 }
