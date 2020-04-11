@@ -6,7 +6,7 @@ import kotlin.reflect.KProperty
 
 class RenderProp<T>(
     var value: T,
-    needInit: Boolean = true,
+    private val needInit: Boolean = true,
     private val onChange: ((T) -> Unit)? = null
 ) : ReadWriteProperty<Binding, T> {
     private val listeners : MutableList<() -> Unit> = mutableListOf()
