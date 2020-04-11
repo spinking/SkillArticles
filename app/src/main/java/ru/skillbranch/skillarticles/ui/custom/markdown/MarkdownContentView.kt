@@ -181,24 +181,25 @@ class MarkdownContentView @JvmOverloads constructor(
         return savedState
     }
 
-    override fun dispatchSaveInstanceState(container: SparseArray<Parcelable>?) {
-        children.filter { it !is MarkdownTextView }
-            .forEachIndexed { index, view ->
-                layoutManager.attachToParent(view, index)
-            }
-        children.filter { it !is MarkdownTextView }
-            .forEach {
-                if (it !is MarkdownTextView) it.saveHierarchyState(layoutManager.container)
-            }
-        dispatchFreezeSelfOnly(container)
-    }
-
     override fun onRestoreInstanceState(state: Parcelable) {
         super.onRestoreInstanceState(state)
         if (state is SavedState) layoutManager = state.layout
         Log.e("MarkdownContentView", "PARENT RESTORE INSTANT STATE: $childCount");
         children.filter { it !is MarkdownTextView }
             .forEachIndexed { index, it -> layoutManager.attachToParent(it, index) }
+    }
+
+    override fun dispatchSaveInstanceState(container: SparseArray<Parcelable>?) {
+        //save childer manually without mardown text view
+        children.filter { it !is MarkdownTextView }
+            .forEach {
+                if (it !is MarkdownTextView) it.saveHierarchyState(layoutManager.container)
+            }
+        children.filter { it !is MarkdownTextView }
+            .forEachIndexed { index, view ->
+                layoutManager.attachToParent(view, index)
+            }
+        dispatchFreezeSelfOnly(container)
     }
 
 
@@ -227,9 +228,7 @@ class MarkdownContentView @JvmOverloads constructor(
             parcel.writeSparseArray(container)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
+        override fun describeContents(): Int = 0
 
         companion object CREATOR : Parcelable.Creator<LayoutManager> {
             override fun createFromParcel(parcel: Parcel): LayoutManager {
