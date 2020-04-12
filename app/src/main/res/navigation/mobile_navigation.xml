@@ -92,6 +92,7 @@
     <action
         android:id="@+id/finish_login"
         app:popUpTo="@id/auth"
-        app:popUpToInclusive="true"/>
+        app:popUpToInclusive="true"
+        app:launchSingleTop="true" />
 
 </navigation>
