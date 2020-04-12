@@ -16,19 +16,20 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions.circleCropTransform
 import com.google.android.material.appbar.AppBarLayout
-import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.fragment_article.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
+import kotlinx.android.synthetic.main.layout_bottombar.view.*
 import kotlinx.android.synthetic.main.layout_submenu.*
+import kotlinx.android.synthetic.main.layout_submenu.view.*
 import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.hideKeyboard
 import ru.skillbranch.skillarticles.extensions.setMarginOptionally
 import ru.skillbranch.skillarticles.ui.IArticleView
 import ru.skillbranch.skillarticles.ui.base.*
-import ru.skillbranch.skillarticles.ui.delegates.ObserveProp
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.article.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.article.ArticleViewModel
@@ -49,7 +50,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     override val binding : ArticleBinding by lazy { ArticleBinding() }
     override val prepareToolbar: (ToolbarBuilder.() -> Unit)? = {
         this.setTitle(args.title)
-            .setSubtitle(args.catecory)
+            .setSubtitle(args.category)
             .setLogo(args.categoryIcon)
             .addMenuItem(
                 MenuItemHolder(
@@ -207,7 +208,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         var isFocusedSearch: Boolean = false
         var searchQuery: String? = null
 
-        private var isLoadingContent by ObserveProp(true)
+        private var isLoadingContent by RenderProp(true)
 
         private var isLike: Boolean by RenderProp(false){ bottombar.btn_like.isChecked = it }
         private var isBookmark: Boolean by RenderProp(false) { bottombar.btn_bookmark.isChecked = it }
@@ -233,7 +234,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             else AppCompatDelegate.MODE_NIGHT_NO
         }
 
-        var isSearch: Boolean by ObserveProp(false) {
+        var isSearch: Boolean by RenderProp(false) {
             if(it) {
                 showSearchBar()
                 with(toolbar) {
@@ -250,9 +251,9 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             }
         }
 
-        private var searchResults: List<Pair<Int, Int>> by ObserveProp(emptyList())
-        private var searchPosition: Int by ObserveProp(0)
-        private var content: List<MarkdownElement> by ObserveProp(emptyList()) {
+        private var searchResults: List<Pair<Int, Int>> by RenderProp(emptyList())
+        private var searchPosition: Int by RenderProp(0)
+        private var content: List<MarkdownElement> by RenderProp(emptyList()) {
             //tv_text_content.isLoading = it.isEmpty()
             tv_text_content.setContent(it)
             if(it.isNotEmpty()) setupCopyListener()

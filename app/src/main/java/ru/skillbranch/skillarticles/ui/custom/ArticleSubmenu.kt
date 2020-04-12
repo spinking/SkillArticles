@@ -20,11 +20,6 @@ class ArticleSubmenu @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) , CoordinatorLayout.AttachedBehavior {
-
-    constructor() : this (
-
-    )
-
     override fun getBehavior(): CoordinatorLayout.Behavior<ArticleSubmenu> {
         return SubmenuBehavior()
     }

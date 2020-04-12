@@ -1,6 +1,9 @@
 package ru.skillbranch.skillarticles.ui.articles
 
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.fragment_articles.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.ArticleItemData
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
@@ -8,8 +11,10 @@ import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.base.BottombarBuilder
 import ru.skillbranch.skillarticles.ui.base.ToolbarBuilder
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
+import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesState
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 
 class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
     override val binding: ArticlesBinding by lazy { ArticlesBinding() }
@@ -17,7 +22,17 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
     override val layout: Int = R.layout.fragment_articles
 
     private val articlesAdapter = ArticlesAdapter{ item ->
-        //val action = ArticlesFragment
+        val action = ArticlesFragmentDirections.actionNavArticlesToPageArticle(
+            item.author,
+            item.authorAvatar,
+            item.category,
+            item.categoryIcon,
+            item.poster,
+            item.title,
+            item.date
+        )
+
+        viewModel.navigate(NavigationCommand.To(action.actionId, action.arguments))
     }
 
     override val prepareToolbar: (ToolbarBuilder.() -> Unit)?
@@ -26,7 +41,11 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         get() = super.prepareBottombar
 
     override fun setupViews() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        with(rv_articles) {
+            layoutManager = LinearLayoutManager(context)
+            adapter = articlesAdapter
+            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+        }
     }
 
     inner class ArticlesBinding : Binding() {
@@ -35,7 +54,8 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         }
 
         override fun bind(data: IViewModelState) {
-
+            data as ArticlesState
+            articles = data.articles
         }
     }
 }
