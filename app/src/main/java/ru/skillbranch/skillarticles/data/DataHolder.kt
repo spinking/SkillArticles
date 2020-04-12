@@ -1,8 +1,10 @@
 package ru.skillbranch.skillarticles.data
 
+import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -148,6 +150,7 @@ data class AppSettings(
     val isBigText: Boolean = false
 )
 
+@Parcelize
 data class ArticleItemData(
     val id: String = "0",
     val date: Date = Date(),
@@ -161,7 +164,7 @@ data class ArticleItemData(
     val likeCount: Int = 16,
     val commentCount: Int = 2,
     val readDuration: Int = 3
-)
+) : Parcelable
 
 val article1: String = """
 Let’s say that we need to draw a **rounded** corner background on text, supporting the following cases:
