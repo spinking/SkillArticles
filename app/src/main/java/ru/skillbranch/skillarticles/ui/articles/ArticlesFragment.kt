@@ -1,5 +1,7 @@
 package ru.skillbranch.skillarticles.ui.articles
 
+import androidx.fragment.app.viewModels
+import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.ArticleItemData
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
@@ -10,11 +12,14 @@ import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 
 class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
-    override val binding: ArticlesBinding
-    override val viewModel: ArticlesViewModel
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    override val layout: Int
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val binding: ArticlesBinding by lazy { ArticlesBinding() }
+    override val viewModel: ArticlesViewModel by viewModels()
+    override val layout: Int = R.layout.fragment_articles
+
+    private val articlesAdapter = ArticlesAdapter{ item ->
+        //val action = ArticlesFragment
+    }
+
     override val prepareToolbar: (ToolbarBuilder.() -> Unit)?
         get() = super.prepareToolbar
     override val prepareBottombar: (BottombarBuilder.() -> Unit)?

@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigator
 
 abstract class BaseViewModel<T : IViewModelState>(
     private val handleState: SavedStateHandle,

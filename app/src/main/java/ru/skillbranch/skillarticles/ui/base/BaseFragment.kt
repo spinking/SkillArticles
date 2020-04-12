@@ -28,14 +28,17 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
+    ): View? = inflater.inflate(layout, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         //prepare toolbar
         root.toolbarBuilder
             .invalidate()
             .prepare(prepareToolbar)
             .build(root)
+
         root.bottombarBuilder
             .invalidate()
             .prepare(prepareBottombar)
@@ -52,6 +55,7 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
 
         viewModel.observeNotifications(viewLifecycleOwner) { root.renderNotification(it) }
         viewModel.observeNavigation(viewLifecycleOwner) { root.viewModel.navigate(it) }
+
         setupViews()
     }
 
@@ -65,7 +69,7 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
         if(root.toolbarBuilder.items.isNotEmpty()) {
             for((index, menuHolder) in root.toolbarBuilder.items.withIndex()) {
                 val item = menu.add(0, menuHolder.menuId, index, menuHolder.title)
-                item.setShowAsActionFlag(MenuItem.SHOW_AS_ACTION_ALWAYS or MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
+                item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS or MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
                     .setIcon(menuHolder.icon)
                     .setOnMenuItemClickListener {
                         menuHolder.clickListener?.invoke(it)?.let { true } ?: false
