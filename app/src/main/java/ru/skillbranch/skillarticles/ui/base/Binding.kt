@@ -22,6 +22,8 @@ abstract class Binding {
         delegates.forEach { it.value.bind() }
     }
 
+    abstract fun bind(data : IViewModelState)
+
     open fun saveUi(outState: Bundle) {
 
     }
