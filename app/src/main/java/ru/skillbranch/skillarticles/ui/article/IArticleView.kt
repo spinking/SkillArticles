@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.ui
+package ru.skillbranch.skillarticles.ui.article
 
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
