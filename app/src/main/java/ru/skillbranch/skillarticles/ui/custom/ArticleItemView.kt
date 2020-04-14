@@ -1,15 +1,19 @@
 package ru.skillbranch.skillarticles.ui.custom
 
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
+import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
+import com.bumptech.glide.Glide
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.ArticleItemData
 import ru.skillbranch.skillarticles.extensions.attrValue
+import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.format
 
 class ArticleItemView(
@@ -57,6 +61,11 @@ class ArticleItemView(
     private val commentsDrawable = context.resources.getDrawable(R.drawable.ic_insert_comment_black_24dp, context.theme)
     private val bookmarkDrawable = context.resources.getDrawable(R.drawable.bookmark_states)
 
+    @Px
+    private val posterSize: Int = context.dpToIntPx(64)
+    @Px
+    private val categorySize: Int = context.dpToIntPx(40)
+
     @ColorInt
     private val colorGray: Int = context.getColor(R.color.color_gray)
     @ColorInt
@@ -74,11 +83,17 @@ class ArticleItemView(
         addView(iv_poster)
         iv_category = ImageView(context)
         addView(iv_category)
-        iv_likes = ImageView(context)
+        iv_likes = ImageView(context).apply {
+            background = likeDrawable
+        }
         addView(iv_likes)
-        iv_comments = ImageView(context)
+        iv_comments = ImageView(context).apply {
+            background = commentsDrawable
+        }
         addView(iv_comments)
-        iv_bookmarks = ImageView(context)
+        iv_bookmarks = ImageView(context).apply {
+            background = bookmarkDrawable
+        }
         addView(iv_bookmarks)
 
 
@@ -125,9 +140,13 @@ class ArticleItemView(
         addView(tv_read_duration)
     }
 
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        var usedHeight = 0
+        val width = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
+
+        iv_poster.measure(posterSize, posterSize)
+        iv_category.measure(categorySize, categorySize)
+
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -143,6 +162,14 @@ class ArticleItemView(
         tv_comments_count?.text = data.commentCount.toString()
         tv_read_duration?.text = data.readDuration.toString()
 
+        Glide.with(context)
+            .load(data.authorAvatar)
+            .centerCrop()
+            .into(iv_poster)
 
+        Glide.with(context)
+            .load(data.categoryIcon)
+            .centerCrop()
+            .into(iv_poster)
     }
 }
