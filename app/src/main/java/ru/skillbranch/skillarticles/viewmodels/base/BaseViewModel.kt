@@ -170,4 +170,7 @@ sealed class NavigationCommand() {
     data class FinishLogin(
         val privateDestination: Int? = null
     ) : NavigationCommand()
+    data class ReplaceAuth(
+        val privateDestination: Int? = null
+    ) : NavigationCommand()
 }
