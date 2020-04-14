@@ -42,7 +42,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(),
     override val viewModel: ArticleViewModel by viewModels {
         ViewModelFactory(
             owner = this,
-            params = args.articleId
+            params = args.articleId.toString()
         )
     }
 
