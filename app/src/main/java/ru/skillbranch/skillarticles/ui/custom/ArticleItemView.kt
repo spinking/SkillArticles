@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.InputType
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -127,13 +128,13 @@ class ArticleItemView(
         tv_title = TextView(context).apply {
             setTextColor(colorPrimary)
             textSize = textMaxSize
+            setPaddingOptionally(right = standartPadding + posterSize + categorySize)
         }
         addView(tv_title)
 
         tv_description = TextView(context).apply {
             setTextColor(colorPrimary)
             textSize = textStandartSize
-            setPaddingOptionally(right = standartPadding + posterSize + categorySize)
         }
         addView(tv_description)
 
@@ -172,11 +173,10 @@ class ArticleItemView(
         usedHeight += posterSize
 
         iv_category.measure(categorySize, categorySize)
-        usedHeight += categorySize / 2 + context.dpToIntPx(8)
+        usedHeight += categorySize + context.dpToIntPx(8)
 
-        val msDesc = MeasureSpec.makeMeasureSpec(width - posterSize - categorySize / 2 - miniMargin, MeasureSpec.AT_MOST)
-        tv_description?.measure(msDesc, heightMeasureSpec)
-        usedHeight += tv_description?.measuredHeight ?: 0
+        tv_title?.measure(ms, heightMeasureSpec)
+        //usedHeight += tv_description?.measuredHeight ?: 0
 
         iv_likes.measure(iconSize, iconSize)
         usedHeight += iconSize
@@ -184,12 +184,12 @@ class ArticleItemView(
         tv_comments_count?.measure(ms, heightMeasureSpec)
         tv_likes_count?.measure(ms, heightMeasureSpec)
         tv_description?.measure(ms, heightMeasureSpec)
+        usedHeight += tv_description?.measuredHeight ?: 0
+
         tv_read_duration?.measure(ms, heightMeasureSpec)
 
         iv_bookmarks.measure(iconSize, iconSize)
         iv_comments.measure(iconSize, iconSize)
-
-        //usedHeight += context.dpToIntPx(16 + 16 + 16 + 8)
 
         setMeasuredDimension(width, usedHeight)
     }
@@ -237,14 +237,77 @@ class ArticleItemView(
             usedHeight + categorySize
         )
 
-        tv_description?.layout(
+        usedHeight += categorySize
+
+        tv_title?.layout(
             left,
             tv_author?.measuredHeight ?: 0,
             right,
             (tv_author?.measuredHeight ?: 0) + posterSize + categorySize
         )
 
-        usedHeight += posterSize + categorySize / 2
+
+        tv_description?.layout(
+            left,
+            usedHeight,
+            right,
+            usedHeight + (tv_description?.measuredHeight ?: 0)
+        )
+
+        usedHeight += tv_description?.measuredHeight ?: 0
+
+        iv_likes.layout(
+            left,
+            usedHeight,
+            left + iconSize,
+            usedHeight + iconSize
+        )
+
+        var usedWidth = left + iconSize
+
+        usedWidth += miniMargin
+        tv_likes_count?.layout(
+            usedWidth,
+            usedHeight,
+            usedWidth + (tv_likes_count?.measuredWidth ?: 0),
+            usedHeight + (tv_likes_count?.measuredHeight ?: 0)
+        )
+
+        usedWidth += standartPadding + standartPadding
+
+        iv_comments.layout(
+            usedWidth,
+            usedHeight,
+            usedWidth + iconSize,
+            usedHeight + iconSize
+        )
+        usedWidth += iconSize + miniMargin
+
+        tv_comments_count?.layout(
+            usedWidth,
+            usedHeight,
+            usedWidth + (tv_comments_count?.measuredWidth ?: 0),
+            usedHeight + (tv_comments_count?.measuredHeight ?: 0)
+        )
+
+        usedWidth += (tv_comments_count?.measuredWidth ?: 0) + standartPadding
+
+        tv_read_duration?.layout(
+            usedWidth,
+            usedHeight,
+            usedWidth + (tv_read_duration?.measuredWidth ?: 0),
+            (tv_read_duration?.measuredHeight ?: 0) + usedHeight
+        )
+
+        iv_bookmarks.layout(
+            right - standartPadding - iconSize,
+            usedHeight,
+            right - standartPadding,
+            usedHeight + iconSize
+        )
+
+        usedHeight += iconSize
+        usedHeight +=  (tv_likes_count?.measuredHeight ?: 0)
     }
 
     fun bind(data : ArticleItemData) {
@@ -252,10 +315,9 @@ class ArticleItemView(
         tv_author?.text = data.author
         tv_title?.text = data.title
         tv_description?.text = data.description
-        tv_description?.invalidate()
         tv_likes_count?.text = data.likeCount.toString()
         tv_comments_count?.text = data.commentCount.toString()
-        tv_read_duration?.text = data.readDuration.toString()
+        tv_read_duration?.text = "${data.readDuration} min read"
 
         Glide.with(context)
             .load(data.poster)
