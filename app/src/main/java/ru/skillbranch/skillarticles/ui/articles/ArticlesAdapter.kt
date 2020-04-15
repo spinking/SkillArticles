@@ -11,14 +11,16 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_article.*
+import kotlinx.android.synthetic.main.item_article.view.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.ArticleItemData
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.format
+import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
 class ArticlesAdapter(private val listener: (ArticleItemData) -> Unit) : ListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
-        val containerView = LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
+        val containerView = LayoutInflater.from(parent.context).inflate(R.layout.item_article_1, parent, false)
         return ArticleVH(containerView)
     }
 
@@ -42,7 +44,8 @@ class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(cont
         val cornerRadius = containerView.context.dpToIntPx(8)
         val categorySize = containerView.context.dpToIntPx(48)
 
-        Glide.with(containerView.context)
+        (containerView as ArticleItemView).bind(item)
+/*        Glide.with(containerView.context)
             .load(item.poster)
             .transform(CenterCrop(), RoundedCorners(cornerRadius))
             .override(posterSize)
@@ -62,7 +65,15 @@ class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(cont
         tv_comments_count.text = "${item.commentCount}"
         tv_read_duration.text = "${item.readDuration} min read"
 
-        itemView.setOnClickListener { listener(item) }
+        itemView.setOnClickListener { listener(item) }*/
 
     }
 }
+
+/*
+* *ArticleItemView
+Необходимо реализовать ArticleItemView отображающую контент статьи в списке ArticlesFragment
++2
+Реализуй CustomViewGroup ArticleItemView содержащую метод bind(data : ArticleItemData) для связывания данных и представлений в ArticleItemView. Разметка ArticleItemView должна соответствовать
+*  item_article.xml и иметь первичный конструктор ArticleItemView(context:Context). Расположить ArticleItemView в package ru.skillbranch.skillarticles.ui.custom
+* */
