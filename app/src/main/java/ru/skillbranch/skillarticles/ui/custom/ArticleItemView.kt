@@ -16,20 +16,19 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
+import androidx.core.view.setPadding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.ArticleItemData
-import ru.skillbranch.skillarticles.extensions.attrValue
-import ru.skillbranch.skillarticles.extensions.dpToIntPx
-import ru.skillbranch.skillarticles.extensions.format
-import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
+import ru.skillbranch.skillarticles.extensions.*
 
 @SuppressLint("ViewConstructor")
 class ArticleItemView(
-    context: Context
-) : ViewGroup(context) {
+    context: Context,
+    attributeSet: AttributeSet
+) : ViewGroup(context, attributeSet) {
 
     //views
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -90,6 +89,8 @@ class ArticleItemView(
     @ColorInt
     private val colorPrimary: Int = context.attrValue(R.attr.colorPrimary)
 
+    private var isTextBigger = false
+
     private val textMiniSize: Float = 12f
     private val textStandartSize: Float = 14.2f
     private val textMaxSize: Float = 18.2f
@@ -100,6 +101,7 @@ class ArticleItemView(
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        this.setPadding(standartMargin)
         iv_poster = ImageView(context).apply {
             id = R.id.iv_poster
         }
@@ -137,7 +139,7 @@ class ArticleItemView(
             setTextColor(colorPrimary)
             textSize = textMaxSize
             gravity = Gravity.CENTER_VERTICAL
-            setPaddingOptionally(right = posterSize + standartMargin)
+            setPaddingOptionally(right = posterSize + paddingRight + context.dpToIntPx(24))
         }
         addView(tv_title)
 
@@ -145,6 +147,7 @@ class ArticleItemView(
             id = R.id.tv_description
             compoundDrawableTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_gray))
             textSize = textStandartSize
+            setPaddingOptionally(right = paddingRight)
         }
         addView(tv_description)
 
@@ -170,26 +173,31 @@ class ArticleItemView(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var usedHeight = 0
+        var usedHeight = paddingTop
         val width = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
         val ms = MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST)
 
         tv_date?.measure(ms, heightMeasureSpec)
-        usedHeight += (tv_date?.measuredHeight ?: 0) + miniMargin
+        usedHeight += (tv_date?.measuredHeight!!) + miniMargin
 
         tv_author?.measure(ms, heightMeasureSpec)
 
         iv_poster.measure(ms, heightMeasureSpec)
-        usedHeight += posterSize
-
         iv_category.measure(ms, heightMeasureSpec)
-        usedHeight += categorySize / 2
-        usedHeight += miniMargin
-
         tv_title?.measure(ms, heightMeasureSpec)
 
+        if(tv_title?.measuredHeight!! > posterWithCategorySize) {
+            isTextBigger = true
+            usedHeight += tv_title?.measuredHeight!!
+        } else {
+            usedHeight += posterSize
+            usedHeight += categorySize / 2
+        }
+        usedHeight += miniMargin
+
+
         tv_description?.measure(ms, heightMeasureSpec)
-        usedHeight += (tv_description?.measuredHeight ?: 0)
+        usedHeight += (tv_description?.measuredHeight!!)
         usedHeight += miniMargin
 
         iv_likes.measure(ms, heightMeasureSpec)
@@ -200,6 +208,7 @@ class ArticleItemView(
         iv_bookmarks.measure(iconSize, iconSize)
 
         usedHeight += iconSize
+        usedHeight += standartMargin
 
         setMeasuredDimension(width, usedHeight)
     }
@@ -208,65 +217,91 @@ class ArticleItemView(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        var usedHeight = 0
-        var usedWidth = 0
-        val bodyWidth = r - paddingLeft - paddingRight - marginLeft - marginRight
+        var usedHeight = paddingTop
+        var usedWidth = paddingLeft
+        val bodyWidth = r - paddingLeft - paddingRight
         val left = paddingLeft
-        val right = paddingLeft + marginLeft + bodyWidth
+        val right = paddingLeft + bodyWidth
 
-        usedWidth += tv_date?.measuredWidth ?: 0
+        usedWidth += tv_date?.measuredWidth!!
 
         tv_date?.layout(
             left,
             usedHeight,
             usedWidth,
-            usedHeight + (tv_date?.measuredHeight ?: 0)
+            usedHeight + (tv_date?.measuredHeight!!)
         )
 
         tv_author?.layout(
             usedWidth + standartMargin,
             usedHeight,
             right,
-            usedHeight + (tv_author?.measuredHeight ?: 0)
+            usedHeight + (tv_author?.measuredHeight!!)
         )
 
-        usedHeight += if(usedWidth == 0) (tv_author?.measuredHeight ?: 0) else (tv_date?.measuredHeight ?: 0)
+        usedHeight += if(usedWidth == 0) (tv_author?.measuredHeight!!) else (tv_date?.measuredHeight!!)
         usedHeight += miniMargin
 
-        iv_poster.layout(
-            right - posterSize,
-            usedHeight,
-            right,
-            usedHeight + posterSize
-        )
+        if(isTextBigger) {
+            tv_title?.layout(
+                left,
+                usedHeight,
+                right,
+                usedHeight + (tv_title?.measuredHeight!!)
+            )
 
-        usedHeight += posterSize
+            iv_poster.layout(
+                right - posterSize,
+                usedHeight + tv_title?.measuredHeight!! / 2 - posterSize / 2,
+                right,
+                usedHeight + tv_title?.measuredHeight!! / 2 + posterSize / 2
+            )
 
-        iv_category.layout(
-            right - posterSize - categorySize / 2,
-            usedHeight - categorySize / 2,
-            right - posterSize + categorySize / 2,
-            usedHeight + categorySize / 2
-        )
+            iv_category.layout(
+                right - posterSize - categorySize / 2,
+                usedHeight + tv_title?.measuredHeight!! / 2 + posterSize / 2 - categorySize / 2,
+                right - posterSize + categorySize / 2,
+                usedHeight + tv_title?.measuredHeight!! / 2 + posterSize / 2 + categorySize / 2
+            )
 
-        usedHeight += categorySize / 2
+            usedHeight += (tv_title?.measuredHeight!!)
+
+        } else {
+            iv_poster.layout(
+                right - posterSize,
+                usedHeight,
+                right,
+                usedHeight + posterSize
+            )
+
+            iv_category.layout(
+                right - posterSize - categorySize / 2,
+                usedHeight + posterSize - categorySize / 2,
+                right - posterSize + categorySize / 2,
+                usedHeight + posterSize + categorySize / 2
+            )
+
+            tv_title?.layout(
+                left,
+                usedHeight + posterWithCategorySize / 2 - (tv_title?.measuredHeight!!) / 2 + context.dpToIntPx(4),
+                right,
+                usedHeight + posterWithCategorySize / 2 + (tv_title?.measuredHeight!!) / 2 + context.dpToIntPx(4)
+            )
+
+            usedHeight += posterSize
+            usedHeight += categorySize / 2
+        }
+
         usedHeight += miniMargin
-
-        tv_title?.layout(// cut text before avatar
-            left,
-            (tv_date?.measuredHeight ?: 0) + posterWithCategorySize / 2 - (tv_title?.measuredHeight ?: 0) / 2 + context.dpToIntPx(4),
-            right,
-            (tv_date?.measuredHeight ?: 0) + posterWithCategorySize / 2 + (tv_title?.measuredHeight ?: 0) /2 + context.dpToIntPx(4)
-        )
 
         tv_description?.layout(
             left,
             usedHeight,
             right,
-            usedHeight + (tv_description?.measuredHeight ?: 0)
+            usedHeight + (tv_description?.measuredHeight!!)
         )
 
-        usedHeight += (tv_description?.measuredHeight ?: 0)
+        usedHeight += (tv_description?.measuredHeight!!)
         usedHeight += miniMargin
 
         iv_likes.layout(
@@ -276,18 +311,18 @@ class ArticleItemView(
             usedHeight + iconSize
         )
 
-        usedWidth = 0
+        usedWidth = paddingLeft
         usedWidth += iconSize
         usedWidth += miniMargin
 
         tv_likes_count?.layout(
             usedWidth,
             usedHeight,
-            usedWidth + (tv_likes_count?.measuredWidth ?: 0),
+            usedWidth + (tv_likes_count?.measuredWidth!!),
             usedHeight + iconSize
         )
 
-        usedWidth += (tv_likes_count?.measuredWidth ?: 0)
+        usedWidth += (tv_likes_count?.measuredWidth!!)
         usedWidth += standartMargin
 
         iv_comments.layout(
@@ -302,18 +337,18 @@ class ArticleItemView(
         tv_comments_count?.layout(
             usedWidth,
             usedHeight,
-            usedWidth + (tv_comments_count?.measuredWidth ?: 0),
+            usedWidth + (tv_comments_count?.measuredWidth!!),
             usedHeight + iconSize
         )
 
-        usedWidth += (tv_comments_count?.measuredWidth ?: 0)
+        usedWidth += (tv_comments_count?.measuredWidth!!)
         usedWidth += standartMargin
 
         tv_read_duration?.layout(
             usedWidth,
             usedHeight,
-            usedWidth + (tv_read_duration?.measuredWidth ?: 0),
-            (tv_read_duration?.measuredHeight ?: 0) + usedHeight
+            usedWidth + (tv_read_duration?.measuredWidth!!),
+            (tv_read_duration?.measuredHeight!!) + usedHeight
         )
 
         iv_bookmarks.layout(
