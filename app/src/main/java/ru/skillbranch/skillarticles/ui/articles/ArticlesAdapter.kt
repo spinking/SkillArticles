@@ -20,7 +20,7 @@ import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
 class ArticlesAdapter(private val listener: (ArticleItemData) -> Unit) : ListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
-        val containerView = LayoutInflater.from(parent.context).inflate(R.layout.item_article_1, parent, false)
+        val containerView = LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
         return ArticleVH(containerView)
     }
 
@@ -44,8 +44,8 @@ class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(cont
         val cornerRadius = containerView.context.dpToIntPx(8)
         val categorySize = containerView.context.dpToIntPx(48)
 
-        (containerView as ArticleItemView).bind(item)
-/*        Glide.with(containerView.context)
+        //(containerView as ArticleItemView).bind(item)
+        Glide.with(containerView.context)
             .load(item.poster)
             .transform(CenterCrop(), RoundedCorners(cornerRadius))
             .override(posterSize)
@@ -65,7 +65,7 @@ class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(cont
         tv_comments_count.text = "${item.commentCount}"
         tv_read_duration.text = "${item.readDuration} min read"
 
-        itemView.setOnClickListener { listener(item) }*/
+        itemView.setOnClickListener { listener(item) }
 
     }
 }

@@ -92,7 +92,7 @@ class ArticleItemView(
     private val colorPrimary: Int = context.attrValue(R.attr.colorPrimary)
 
     private val textMiniSize: Float = 12f
-    private val textStandartSize: Float = 14f
+    private val textStandartSize: Float = 14.2f
     private val textMaxSize: Float = 18.2f
 
     private val likeDrawable = context.resources.getDrawable(R.drawable.ic_favorite_black_24dp, context.theme).apply { setTint(colorGray) }
