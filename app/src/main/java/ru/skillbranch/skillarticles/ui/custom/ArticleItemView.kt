@@ -28,9 +28,8 @@ import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
 
 @SuppressLint("ViewConstructor")
 class ArticleItemView(
-    context: Context,
-    attributeSet: AttributeSet
-) : ViewGroup(context, attributeSet, 0) {
+    context: Context
+) : ViewGroup(context) {
 
     //views
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
