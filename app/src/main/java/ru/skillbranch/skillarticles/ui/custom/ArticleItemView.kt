@@ -2,9 +2,9 @@ package ru.skillbranch.skillarticles.ui.custom
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.PorterDuff
+import android.graphics.Typeface
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -12,8 +12,6 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
-import androidx.core.content.ContextCompat
-import androidx.core.widget.ImageViewCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -129,6 +127,7 @@ class ArticleItemView(
         addView(tv_author)
 
         tv_title = TextView(context).apply {
+            setTypeface(this.typeface, Typeface.BOLD)
             setTextColor(colorPrimary)
             textSize = textMaxSize
             setPaddingOptionally(right = standartPadding + posterSize + categorySize)
@@ -172,11 +171,11 @@ class ArticleItemView(
 
         tv_author?.measure(ms, heightMeasureSpec)
 
-        iv_poster.measure(posterSize, posterSize)
+        iv_poster.measure(ms, heightMeasureSpec)
         usedHeight += posterSize
 
-        iv_category.measure(categorySize, categorySize)
-        usedHeight += categorySize + context.dpToIntPx(8)
+        iv_category.measure(ms, heightMeasureSpec)
+        usedHeight += categorySize + context.dpToIntPx(16)
 
         tv_title?.measure(ms, heightMeasureSpec)
         //usedHeight += tv_description?.measuredHeight ?: 0
@@ -240,15 +239,14 @@ class ArticleItemView(
             usedHeight + categorySize
         )
 
-        usedHeight += categorySize
+        usedHeight += categorySize + standartPadding
 
         tv_title?.layout(
             left,
-            tv_author?.measuredHeight ?: 0,
+            tv_title?.measuredHeight ?: 0,
             right,
             (tv_author?.measuredHeight ?: 0) + posterSize + categorySize
         )
-
 
         tv_description?.layout(
             left,
