@@ -2,6 +2,7 @@ package ru.skillbranch.skillarticles.ui.custom
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.Gravity
@@ -12,6 +13,9 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
+import androidx.core.view.marginLeft
+import androidx.core.view.marginRight
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -73,7 +77,9 @@ class ArticleItemView(
     @Px
     private val iconSize: Int = context.dpToIntPx(16)
     @Px
-    private val standartPadding: Int = context.dpToIntPx(16)
+    private val posterWithCategorySize: Int = context.dpToIntPx(84)
+    @Px
+    private val standartMargin: Int = context.dpToIntPx(16)
 
     @Px
     private val cornerRadius: Int = context.dpToIntPx(8)
@@ -84,14 +90,14 @@ class ArticleItemView(
 
     @ColorInt
     private val colorPrimary: Int = context.attrValue(R.attr.colorPrimary)
-    private val textMiniSize: Float = 12f
 
+    private val textMiniSize: Float = 12f
     private val textStandartSize: Float = 14f
-    private val textMaxSize: Float = 18f
+    private val textMaxSize: Float = 18.2f
 
     private val likeDrawable = context.resources.getDrawable(R.drawable.ic_favorite_black_24dp, context.theme).apply { setTint(colorGray) }
     private val commentsDrawable = context.resources.getDrawable(R.drawable.ic_insert_comment_black_24dp, context.theme).apply { setTint(colorGray) }
-    private val bookmarkDrawable = context.resources.getDrawable(R.drawable.bookmark_states).apply {  setTint(colorGray) }
+    private val bookmarkDrawable = context.resources.getDrawable(R.drawable.bookmark_states, context.theme).apply {  setTint(colorGray) }
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -130,12 +136,13 @@ class ArticleItemView(
             setTypeface(this.typeface, Typeface.BOLD)
             setTextColor(colorPrimary)
             textSize = textMaxSize
-            setPaddingOptionally(right = standartPadding + posterSize + categorySize)
+            gravity = Gravity.CENTER_VERTICAL
+            setPaddingOptionally(right = posterSize + standartMargin)
         }
         addView(tv_title)
 
         tv_description = TextView(context).apply {
-            setTextColor(colorGray)
+            compoundDrawableTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_gray))
             textSize = textStandartSize
         }
         addView(tv_description)
@@ -163,11 +170,10 @@ class ArticleItemView(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var usedHeight = 0
         val width = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
-
         val ms = MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST)
 
         tv_date?.measure(ms, heightMeasureSpec)
-        usedHeight += tv_date?.measuredHeight ?: 0
+        usedHeight += (tv_date?.measuredHeight ?: 0) + miniMargin
 
         tv_author?.measure(ms, heightMeasureSpec)
 
@@ -175,23 +181,23 @@ class ArticleItemView(
         usedHeight += posterSize
 
         iv_category.measure(ms, heightMeasureSpec)
-        usedHeight += categorySize + context.dpToIntPx(16)
+        usedHeight += categorySize / 2
+        usedHeight += miniMargin
 
         tv_title?.measure(ms, heightMeasureSpec)
-        //usedHeight += tv_description?.measuredHeight ?: 0
 
-        iv_likes.measure(iconSize, iconSize)
-        usedHeight += iconSize
-
-        tv_comments_count?.measure(ms, heightMeasureSpec)
-        tv_likes_count?.measure(ms, heightMeasureSpec)
         tv_description?.measure(ms, heightMeasureSpec)
-        usedHeight += tv_description?.measuredHeight ?: 0
+        usedHeight += (tv_description?.measuredHeight ?: 0)
+        usedHeight += miniMargin
 
+        iv_likes.measure(ms, heightMeasureSpec)
+        tv_likes_count?.measure(ms, heightMeasureSpec)
+        tv_comments_count?.measure(ms, heightMeasureSpec)
         tv_read_duration?.measure(ms, heightMeasureSpec)
-
-        iv_bookmarks.measure(iconSize, iconSize)
         iv_comments.measure(iconSize, iconSize)
+        iv_bookmarks.measure(iconSize, iconSize)
+
+        usedHeight += iconSize
 
         setMeasuredDimension(width, usedHeight)
     }
@@ -201,51 +207,54 @@ class ArticleItemView(
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var usedHeight = 0
-        val bodyWidth = r - 1- paddingLeft - paddingRight
+        var usedWidth = 0
+        val bodyWidth = r - paddingLeft - paddingRight - marginLeft - marginRight // Why - 1?
         val left = paddingLeft
-        val right = paddingLeft + bodyWidth
+        val right = paddingLeft + marginLeft + bodyWidth
+
+        usedWidth += tv_date?.measuredWidth ?: 0
 
         tv_date?.layout(
             left,
             usedHeight,
-            tv_date?.measuredWidth ?: 0,
+            usedWidth,
             usedHeight + (tv_date?.measuredHeight ?: 0)
         )
 
-        usedHeight + (tv_date?.measuredHeight ?: 0)
-
         tv_author?.layout(
-            left + (tv_date?.width ?: 0) + context.dpToIntPx(16),
+            usedWidth + standartMargin,
             usedHeight,
-            right - (tv_date?.measuredWidth ?: 0),
+            right,
             usedHeight + (tv_author?.measuredHeight ?: 0)
         )
 
-        usedHeight += tv_date?.measuredHeight ?: 0
+        usedHeight += if(usedWidth == 0) (tv_author?.measuredHeight ?: 0) else (tv_date?.measuredHeight ?: 0)
+        usedHeight += miniMargin
 
         iv_poster.layout(
-            right - posterSize - standartPadding,
+            right - posterSize,
             usedHeight,
-            right - standartPadding,
+            right,
             usedHeight + posterSize
         )
 
         usedHeight += posterSize
 
         iv_category.layout(
-            right - posterSize * 2 - standartPadding * 2,
+            right - posterSize - categorySize / 2,
             usedHeight - categorySize / 2,
-            right,
-            usedHeight - categorySize / 2 + categorySize
+            right - posterSize + categorySize / 2,
+            usedHeight + categorySize / 2
         )
 
-        usedHeight += categorySize / 2 + standartPadding
+        usedHeight += categorySize / 2
+        usedHeight += miniMargin
 
-        tv_title?.layout(
+        tv_title?.layout(// cut text before avatar
             left,
-            tv_title?.measuredHeight ?: 0,
+            (tv_date?.measuredHeight ?: 0) + posterWithCategorySize / 2 - (tv_title?.measuredHeight ?: 0) / 2 + context.dpToIntPx(4),
             right,
-            (tv_author?.measuredHeight ?: 0) + posterSize + categorySize
+            (tv_date?.measuredHeight ?: 0) + posterWithCategorySize / 2 + (tv_title?.measuredHeight ?: 0) /2 + context.dpToIntPx(4)
         )
 
         tv_description?.layout(
@@ -255,7 +264,8 @@ class ArticleItemView(
             usedHeight + (tv_description?.measuredHeight ?: 0)
         )
 
-        usedHeight += tv_description?.measuredHeight ?: 0
+        usedHeight += (tv_description?.measuredHeight ?: 0)
+        usedHeight += miniMargin
 
         iv_likes.layout(
             left,
@@ -264,17 +274,19 @@ class ArticleItemView(
             usedHeight + iconSize
         )
 
-        var usedWidth = left + iconSize
-
+        usedWidth = 0
+        usedWidth += iconSize
         usedWidth += miniMargin
+
         tv_likes_count?.layout(
             usedWidth,
             usedHeight,
             usedWidth + (tv_likes_count?.measuredWidth ?: 0),
-            usedHeight + (tv_likes_count?.measuredHeight ?: 0)
+            usedHeight + iconSize
         )
 
-        usedWidth += standartPadding + standartPadding
+        usedWidth += (tv_likes_count?.measuredWidth ?: 0)
+        usedWidth += standartMargin
 
         iv_comments.layout(
             usedWidth,
@@ -282,16 +294,18 @@ class ArticleItemView(
             usedWidth + iconSize,
             usedHeight + iconSize
         )
-        usedWidth += iconSize + miniMargin
+        usedWidth += iconSize
+        usedWidth += miniMargin
 
         tv_comments_count?.layout(
             usedWidth,
             usedHeight,
             usedWidth + (tv_comments_count?.measuredWidth ?: 0),
-            usedHeight + (tv_comments_count?.measuredHeight ?: 0)
+            usedHeight + iconSize
         )
 
-        usedWidth += (tv_comments_count?.measuredWidth ?: 0) + standartPadding
+        usedWidth += (tv_comments_count?.measuredWidth ?: 0)
+        usedWidth += standartMargin
 
         tv_read_duration?.layout(
             usedWidth,
@@ -301,14 +315,13 @@ class ArticleItemView(
         )
 
         iv_bookmarks.layout(
-            right - standartPadding - iconSize,
+            right - iconSize,
             usedHeight,
-            right - standartPadding,
+            right,
             usedHeight + iconSize
         )
 
         usedHeight += iconSize
-        usedHeight +=  (tv_likes_count?.measuredHeight ?: 0)
     }
 
     fun bind(data : ArticleItemData) {
