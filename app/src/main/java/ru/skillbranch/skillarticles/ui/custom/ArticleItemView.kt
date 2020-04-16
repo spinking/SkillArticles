@@ -2,9 +2,9 @@ package ru.skillbranch.skillarticles.ui.custom
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.InputType
+import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.util.AttributeSet
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -12,6 +12,8 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -65,32 +67,33 @@ class ArticleItemView(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val iv_bookmarks: ImageView
 
-    private val likeDrawable = context.resources.getDrawable(R.drawable.ic_favorite_black_24dp, context.theme)
-    private val commentsDrawable = context.resources.getDrawable(R.drawable.ic_insert_comment_black_24dp, context.theme)
-    private val bookmarkDrawable = context.resources.getDrawable(R.drawable.bookmark_states)
-
     @Px
     private val posterSize: Int = context.dpToIntPx(64)
+
     @Px
     private val categorySize: Int = context.dpToIntPx(40)
     @Px
     private val iconSize: Int = context.dpToIntPx(16)
-
     @Px
     private val standartPadding: Int = context.dpToIntPx(16)
+
     @Px
     private val cornerRadius: Int = context.dpToIntPx(8)
     @Px
     private val miniMargin: Int = context.dpToIntPx(8)
-
     @ColorInt
     private val colorGray: Int = context.getColor(R.color.color_gray)
+
     @ColorInt
     private val colorPrimary: Int = context.attrValue(R.attr.colorPrimary)
-
     private val textMiniSize: Float = 12f
+
     private val textStandartSize: Float = 14f
     private val textMaxSize: Float = 18f
+
+    private val likeDrawable = context.resources.getDrawable(R.drawable.ic_favorite_black_24dp, context.theme).apply { setTint(colorGray) }
+    private val commentsDrawable = context.resources.getDrawable(R.drawable.ic_insert_comment_black_24dp, context.theme).apply { setTint(colorGray) }
+    private val bookmarkDrawable = context.resources.getDrawable(R.drawable.bookmark_states).apply {  setTint(colorGray) }
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -133,7 +136,7 @@ class ArticleItemView(
         addView(tv_title)
 
         tv_description = TextView(context).apply {
-            setTextColor(colorPrimary)
+            setTextColor(colorGray)
             textSize = textStandartSize
         }
         addView(tv_description)
