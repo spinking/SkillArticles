@@ -30,7 +30,7 @@ import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
 class ArticleItemView(
     context: Context,
     attributeSet: AttributeSet
-) : ViewGroup(context, null, 0) {
+) : ViewGroup(context, attributeSet, 0) {
 
     //views
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -102,10 +102,11 @@ class ArticleItemView(
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         iv_poster = ImageView(context).apply {
-
+            id = R.id.iv_poster
         }
         addView(iv_poster)
-        iv_category = ImageView(context)
+        iv_category = ImageView(context).apply {
+        }
         addView(iv_category)
         iv_likes = ImageView(context).apply {
             background = likeDrawable
@@ -120,7 +121,6 @@ class ArticleItemView(
         }
         addView(iv_bookmarks)
 
-
         tv_date = TextView(context).apply {
             setTextColor(colorGray)
             textSize = textMiniSize
@@ -133,6 +133,7 @@ class ArticleItemView(
         addView(tv_author)
 
         tv_title = TextView(context).apply {
+            id = R.id.tv_title
             setTypeface(this.typeface, Typeface.BOLD)
             setTextColor(colorPrimary)
             textSize = textMaxSize
@@ -142,6 +143,7 @@ class ArticleItemView(
         addView(tv_title)
 
         tv_description = TextView(context).apply {
+            id = R.id.tv_description
             compoundDrawableTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_gray))
             textSize = textStandartSize
         }
@@ -160,6 +162,7 @@ class ArticleItemView(
         addView(tv_comments_count)
 
         tv_read_duration = TextView(context).apply {
+            id = R.id.tv_read_duration
             setTextColor(colorGray)
             textSize = textMiniSize
         }
@@ -208,7 +211,7 @@ class ArticleItemView(
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var usedHeight = 0
         var usedWidth = 0
-        val bodyWidth = r - paddingLeft - paddingRight - marginLeft - marginRight // Why - 1?
+        val bodyWidth = r - paddingLeft - paddingRight - marginLeft - marginRight
         val left = paddingLeft
         val right = paddingLeft + marginLeft + bodyWidth
 
