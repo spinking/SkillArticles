@@ -14,8 +14,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginLeft
-import androidx.core.view.marginRight
 import androidx.core.view.setPadding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -26,9 +24,9 @@ import ru.skillbranch.skillarticles.extensions.*
 
 @SuppressLint("ViewConstructor")
 class ArticleItemView(
-    context: Context,
-    attributeSet: AttributeSet
-) : ViewGroup(context, attributeSet) {
+    context: Context/*,
+    attributeSet: AttributeSet*/
+) : ViewGroup(context/*, attributeSet*/) {
 
     //views
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -139,7 +137,6 @@ class ArticleItemView(
             setTextColor(colorPrimary)
             textSize = textMaxSize
             gravity = Gravity.CENTER_VERTICAL
-            setPaddingOptionally(right = posterSize + paddingRight + context.dpToIntPx(24))
         }
         addView(tv_title)
 
@@ -147,7 +144,7 @@ class ArticleItemView(
             id = R.id.tv_description
             compoundDrawableTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_gray))
             textSize = textStandartSize
-            setPaddingOptionally(right = paddingRight)
+            //setPaddingOptionally(right = paddingRight)
         }
         addView(tv_description)
 
@@ -176,6 +173,8 @@ class ArticleItemView(
         var usedHeight = paddingTop
         val width = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
         val ms = MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST)
+        val msTitle = MeasureSpec.makeMeasureSpec(width - posterSize - categorySize / 2 - context.dpToIntPx(4), MeasureSpec.AT_MOST)
+        val msDescription = MeasureSpec.makeMeasureSpec(width - paddingLeft - paddingRight, MeasureSpec.AT_MOST)
 
         tv_date?.measure(ms, heightMeasureSpec)
         usedHeight += (tv_date?.measuredHeight!!) + miniMargin
@@ -184,7 +183,7 @@ class ArticleItemView(
 
         iv_poster.measure(ms, heightMeasureSpec)
         iv_category.measure(ms, heightMeasureSpec)
-        tv_title?.measure(ms, heightMeasureSpec)
+        tv_title?.measure(msTitle, heightMeasureSpec)
 
         if(tv_title?.measuredHeight!! > posterWithCategorySize) {
             isTextBigger = true
@@ -196,7 +195,7 @@ class ArticleItemView(
         usedHeight += miniMargin
 
 
-        tv_description?.measure(ms, heightMeasureSpec)
+        tv_description?.measure(msDescription, heightMeasureSpec)
         usedHeight += (tv_description?.measuredHeight!!)
         usedHeight += miniMargin
 
@@ -218,8 +217,8 @@ class ArticleItemView(
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var usedHeight = paddingTop
-        var usedWidth = paddingLeft
-        val bodyWidth = r - paddingLeft - paddingRight
+        var usedWidth = 0
+        val bodyWidth = r
         val left = paddingLeft
         val right = paddingLeft + bodyWidth
 
@@ -228,12 +227,12 @@ class ArticleItemView(
         tv_date?.layout(
             left,
             usedHeight,
-            usedWidth,
+            left + usedWidth,
             usedHeight + (tv_date?.measuredHeight!!)
         )
 
         tv_author?.layout(
-            usedWidth + standartMargin,
+            usedWidth + left + standartMargin,
             usedHeight,
             right,
             usedHeight + (tv_author?.measuredHeight!!)
@@ -246,21 +245,21 @@ class ArticleItemView(
             tv_title?.layout(
                 left,
                 usedHeight,
-                right,
+                right - posterSize - categorySize / 2 - context.dpToIntPx(4),
                 usedHeight + (tv_title?.measuredHeight!!)
             )
 
             iv_poster.layout(
-                right - posterSize,
+                right - posterSize - paddingLeft - paddingRight,
                 usedHeight + tv_title?.measuredHeight!! / 2 - posterSize / 2,
-                right,
+                right - paddingLeft - paddingRight,
                 usedHeight + tv_title?.measuredHeight!! / 2 + posterSize / 2
             )
 
             iv_category.layout(
-                right - posterSize - categorySize / 2,
+                right - posterSize - categorySize / 2  - paddingLeft - paddingRight,
                 usedHeight + tv_title?.measuredHeight!! / 2 + posterSize / 2 - categorySize / 2,
-                right - posterSize + categorySize / 2,
+                right - posterSize + categorySize / 2  - paddingLeft - paddingRight,
                 usedHeight + tv_title?.measuredHeight!! / 2 + posterSize / 2 + categorySize / 2
             )
 
@@ -268,23 +267,23 @@ class ArticleItemView(
 
         } else {
             iv_poster.layout(
-                right - posterSize,
+                right - posterSize  - paddingLeft - paddingRight,
                 usedHeight,
-                right,
+                right  - paddingLeft - paddingRight,
                 usedHeight + posterSize
             )
 
             iv_category.layout(
-                right - posterSize - categorySize / 2,
+                right - posterSize - categorySize / 2  - paddingLeft - paddingRight,
                 usedHeight + posterSize - categorySize / 2,
-                right - posterSize + categorySize / 2,
+                right - posterSize + categorySize / 2  - paddingLeft - paddingRight,
                 usedHeight + posterSize + categorySize / 2
             )
 
             tv_title?.layout(
                 left,
-                usedHeight + posterWithCategorySize / 2 - (tv_title?.measuredHeight!!) / 2 + context.dpToIntPx(4),
-                right,
+                usedHeight + posterWithCategorySize / 2 - (tv_title?.measuredHeight!!) / 2 - context.dpToIntPx(4),
+                right - posterSize - categorySize / 2 - context.dpToIntPx(4) - paddingLeft - paddingRight,
                 usedHeight + posterWithCategorySize / 2 + (tv_title?.measuredHeight!!) / 2 + context.dpToIntPx(4)
             )
 
@@ -297,7 +296,7 @@ class ArticleItemView(
         tv_description?.layout(
             left,
             usedHeight,
-            right,
+            right - paddingRight - paddingLeft,
             usedHeight + (tv_description?.measuredHeight!!)
         )
 
@@ -352,9 +351,9 @@ class ArticleItemView(
         )
 
         iv_bookmarks.layout(
-            right - iconSize,
+            right - iconSize  - paddingLeft - paddingRight,
             usedHeight,
-            right,
+            right  - paddingLeft - paddingRight,
             usedHeight + iconSize
         )
 
