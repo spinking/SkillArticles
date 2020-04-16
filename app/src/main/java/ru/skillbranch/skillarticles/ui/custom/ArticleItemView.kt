@@ -233,13 +233,13 @@ class ArticleItemView(
         usedHeight += posterSize
 
         iv_category.layout(
-            right - posterSize - standartPadding - categorySize,
+            right - posterSize * 2 - standartPadding * 2,
             usedHeight - categorySize / 2,
-            right - standartPadding - categorySize,
-            usedHeight + categorySize
+            right,
+            usedHeight - categorySize / 2 + categorySize
         )
 
-        usedHeight += categorySize + standartPadding
+        usedHeight += categorySize / 2 + standartPadding
 
         tv_title?.layout(
             left,
