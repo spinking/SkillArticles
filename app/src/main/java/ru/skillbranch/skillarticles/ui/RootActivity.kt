@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
 import android.view.Menu
+import android.view.MotionEvent
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
@@ -43,6 +44,7 @@ class RootActivity : AppCompatActivity() {
         /*switch_mode.setOnClickListener {
             delegate.localNightMode = if(switch_mode.isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         }*/
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
