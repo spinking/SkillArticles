@@ -24,10 +24,12 @@ import ru.skillbranch.skillarticles.extensions.*
 
 @SuppressLint("ViewConstructor")
 class ArticleItemView(
-    context: Context/*,
-    attributeSet: AttributeSet*/
-) : ViewGroup(context/*, attributeSet*/) {
+    context: Context
+) : ViewGroup(context) {
 
+    constructor(context: Context, attributeSet: AttributeSet) : this(context) {
+
+    }
     //views
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var tv_date: TextView? = null
