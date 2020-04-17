@@ -1,10 +1,8 @@
 package ru.skillbranch.skillarticles.data
 
-import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -70,6 +68,7 @@ object LocalDataHolder {
                     title = "Using Safe args plugin — current state of affairs",
                     description = "Article describing usage of Safe args Gradle plugin with the Navigation Architecture Component and current support for argument types",
                     author = "Veronika Petruskova",
+                    //date = Date(1586602982217),
                     authorAvatar = "https://miro.medium.com/fit/c/96/96/1*VSq5CqY3y1Bb4CLK83ZIuw.png",
                     poster = "https://miro.medium.com/max/1920/1*u4uWVOpqFCR1gGpJTewhhA.jpeg"
                 ),
@@ -150,7 +149,6 @@ data class AppSettings(
     val isBigText: Boolean = false
 )
 
-@Parcelize
 data class ArticleItemData(
     val id: String = "0",
     val date: Date = Date(),
@@ -164,7 +162,7 @@ data class ArticleItemData(
     val likeCount: Int = 16,
     val commentCount: Int = 2,
     val readDuration: Int = 3
-) : Parcelable
+)
 
 val article1: String = """
 Let’s say that we need to draw a **rounded** corner background on text, supporting the following cases:
