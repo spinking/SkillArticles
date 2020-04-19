@@ -175,7 +175,7 @@ class ArticleItemView(
         var usedHeight = paddingTop
         val width = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
         val ms = MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST)
-        val msTitle = MeasureSpec.makeMeasureSpec(width - posterSize - categorySize / 2 - context.dpToIntPx(4), MeasureSpec.AT_MOST)
+        val msTitle = MeasureSpec.makeMeasureSpec(width - posterSize - categorySize / 2 - context.dpToIntPx(8), MeasureSpec.AT_MOST)
         val msDescription = MeasureSpec.makeMeasureSpec(width - paddingLeft - paddingRight, MeasureSpec.AT_MOST)
 
         tv_date?.measure(ms, heightMeasureSpec)
