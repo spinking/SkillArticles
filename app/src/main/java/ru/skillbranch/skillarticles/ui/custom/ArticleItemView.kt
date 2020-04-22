@@ -128,6 +128,7 @@ class ArticleItemView(
         }
         addView(tv_date)
         tv_author = TextView(context).apply {
+            id = R.id.author
             setTextColor(colorPrimary)
             textSize = textMiniSize
         }
