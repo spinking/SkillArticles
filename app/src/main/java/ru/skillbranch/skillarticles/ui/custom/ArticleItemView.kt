@@ -35,7 +35,7 @@ class ArticleItemView(
     var tv_date: TextView? = null
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var author: TextView? = null
+    var tv_author: TextView? = null
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var tv_title: TextView? = null
@@ -127,12 +127,12 @@ class ArticleItemView(
             textSize = textMiniSize
         }
         addView(tv_date)
-        author = TextView(context).apply {
-            id = R.id.author
+        tv_author = TextView(context).apply {
+            id = R.id.tv_author
             setTextColor(colorPrimary)
             textSize = textMiniSize
         }
-        addView(author)
+        addView(tv_author)
 
         tv_title = TextView(context).apply {
             id = R.id.tv_title
@@ -182,7 +182,7 @@ class ArticleItemView(
         tv_date?.measure(ms, heightMeasureSpec)
         usedHeight += (tv_date?.measuredHeight!!) + miniMargin
 
-        author?.measure(ms, heightMeasureSpec)
+        tv_author?.measure(ms, heightMeasureSpec)
 
         iv_poster.measure(ms, heightMeasureSpec)
         iv_category.measure(ms, heightMeasureSpec)
@@ -234,14 +234,14 @@ class ArticleItemView(
             usedHeight + (tv_date?.measuredHeight!!)
         )
 
-        author?.layout(
+        tv_author?.layout(
             usedWidth + left + standartMargin,
             usedHeight,
             right,
-            usedHeight + (author?.measuredHeight!!)
+            usedHeight + (tv_author?.measuredHeight!!)
         )
 
-        usedHeight += if(usedWidth == 0) (author?.measuredHeight!!) else (tv_date?.measuredHeight!!)
+        usedHeight += if(usedWidth == 0) (tv_author?.measuredHeight!!) else (tv_date?.measuredHeight!!)
         usedHeight += miniMargin
 
         if(isTextBigger) {
@@ -365,7 +365,7 @@ class ArticleItemView(
 
     fun bind(data : ArticleItemData) {
         tv_date?.text = data.date.format()
-        author?.text = data.author
+        tv_author?.text = data.author
         tv_title?.text = data.title
         tv_description?.text = data.description
         tv_likes_count?.text = data.likeCount.toString()

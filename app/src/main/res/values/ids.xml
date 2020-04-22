@@ -4,5 +4,5 @@
     <item name="iv_poster" type="id"/>
     <item name="tv_description" type="id"/>
     <item name="tv_read_duration" type="id"/>
-    <item name="author" type="id"/>
+    <item name="tv_author" type="id"/>
 </resources>
