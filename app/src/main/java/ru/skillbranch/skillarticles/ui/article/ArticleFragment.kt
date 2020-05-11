@@ -327,7 +327,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(),
             searchPosition = data.searchPosition
             searchResults = data.searchResults
 
-            answerTo = data.asnwerTo ?: "Comment"
+            answerTo = data.answerTo ?: "Comment"
             isShowBottombar = data.showBottomBar
 
         }
