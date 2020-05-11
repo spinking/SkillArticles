@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewAnimationUtils
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -99,6 +100,14 @@ class Bottombar @JvmOverloads constructor(
             0 -> btn_result_up.isEnabled = false
             searchCount -1 -> btn_result_down.isEnabled = false
         }
+    }
+
+    fun show() {
+        this.visibility = View.VISIBLE
+    }
+
+    fun hide() {
+        this.visibility = View.GONE
     }
 
     private class SavedState : BaseSavedState, Parcelable {
