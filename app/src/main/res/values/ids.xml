@@ -5,4 +5,5 @@
     <item name="tv_description" type="id"/>
     <item name="tv_read_duration" type="id"/>
     <item name="tv_author" type="id"/>
+    <item name="tv_comment_body" type="id"/>
 </resources>

@@ -3,6 +3,7 @@ package ru.skillbranch.skillarticles.ui
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
@@ -43,8 +44,9 @@ class RootActivity : BaseActivity<RootViewModel>() {
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             //if destination change set select bottom navigation item
             if(viewModel.currentState.isAuth && destination.id == R.id.nav_auth) {
-                val options = NavOptions.Builder().setPopUpTo(destination.id, true).build()
-                viewModel.navigate(NavigationCommand.To(R.id.nav_profile, arguments, options))
+                //val options = NavOptions.Builder().setPopUpTo(destination.id, true).build()
+                navController.popBackStack(destination.id, true)
+                viewModel.navigate(NavigationCommand.To(R.id.nav_profile, arguments/*, options*/))
             }
             nav_view.selectDestination(destination)
         }
