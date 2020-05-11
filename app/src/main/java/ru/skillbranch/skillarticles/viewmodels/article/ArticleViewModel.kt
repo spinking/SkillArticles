@@ -26,6 +26,10 @@ class ArticleViewModel(
     private val repository = ArticleRepository
     private var clearContent: String? = null
 
+    private val listConfig by lazy {
+
+    }
+
     init {
         subscribeOnDataSource(
             source = getArticleData(),
