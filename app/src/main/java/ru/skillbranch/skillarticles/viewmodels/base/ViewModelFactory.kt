@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import ru.skillbranch.skillarticles.viewmodels.article.ArticleViewModel
+import ru.skillbranch.skillarticles.viewmodels.bookmarks.BookmarksViewModel
 import java.lang.IllegalArgumentException
 
 

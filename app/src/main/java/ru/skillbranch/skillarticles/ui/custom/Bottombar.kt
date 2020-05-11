@@ -104,10 +104,12 @@ class Bottombar @JvmOverloads constructor(
 
     fun show() {
         this.visibility = View.VISIBLE
+        invalidate()
     }
 
     fun hide() {
         this.visibility = View.GONE
+        invalidate()
     }
 
     private class SavedState : BaseSavedState, Parcelable {

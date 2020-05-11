@@ -111,6 +111,10 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
     fun handleSearchMode(isSearch: Boolean) {
         updateState { it.copy(isSearch = isSearch) }
     }
+
+    fun handleToggleBookmark(id: String, isChecked: Boolean) {
+        repository.updateBookmark(id, isChecked)
+    }
 }
 
 data class ArticlesState(
@@ -125,7 +129,7 @@ class ArticlesBoundaryCallback(
 ) : PagedList.BoundaryCallback<ArticleItemData>() {
     override fun onZeroItemsLoaded() {
         //Storage is empty
-        onZeroItemsLoaded()
+        zeroLoadingHandle()
     }
 
     override fun onItemAtEndLoaded(itemAtEnd: ArticleItemData) {
