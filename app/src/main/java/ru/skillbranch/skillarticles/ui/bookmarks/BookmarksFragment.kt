@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_bookmarks.*
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.listeners.OnArticleListener
 import ru.skillbranch.skillarticles.ui.articles.ArticlesAdapter
 import ru.skillbranch.skillarticles.ui.base.*
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
@@ -19,14 +19,8 @@ import ru.skillbranch.skillarticles.viewmodels.bookmarks.BookmarksViewModel
 
 class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
     override val binding: BookmarksBinding by lazy { BookmarksBinding() }
-    override var viewModel: BookmarksViewModel by viewModels()
     override val layout: Int = R.layout.fragment_bookmarks
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(BookmarksViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
+    override val viewModel: BookmarksViewModel by viewModels()
 
     private val articlesAdapter = ArticlesAdapter{ item ->
         val action = BookmarksFragmentDirections.actionNavBookmarksToPageArticle(
@@ -103,11 +97,19 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
     }
 
     override fun setupViews() {
+        articlesAdapter.bookmarkListener = object : OnArticleListener {
+            override fun bookmarksClick(itemId: String, isChecked: Boolean) {
+                viewModel.handleToggleBookmark(itemId, isChecked)
+            }
+        }
+
+
         with(rv_bookmarks) {
             layoutManager = LinearLayoutManager(context)
             adapter = articlesAdapter
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
         }
+
         viewModel.observeList(viewLifecycleOwner) {
             articlesAdapter.submitList(it)
         }

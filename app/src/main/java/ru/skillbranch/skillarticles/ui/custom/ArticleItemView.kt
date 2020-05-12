@@ -15,6 +15,7 @@ import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.shortFormat
+import ru.skillbranch.skillarticles.listeners.OnArticleListener
 import kotlin.math.max
 
 class ArticleItemView constructor(
@@ -24,7 +25,7 @@ class ArticleItemView constructor(
     private val iv_category: ImageView
     private val iv_likes: ImageView
     private val iv_comments: ImageView
-    private val iv_bookmark: CheckableImageView
+    val iv_bookmark: CheckableImageView
     private val tv_date: TextView
     private val tv_author: TextView
     private val tv_title: TextView
@@ -266,7 +267,7 @@ class ArticleItemView constructor(
         )
     }
 
-    fun bind(item: ArticleItemData/*, toggleBookmarkListener: (String, Boolean) -> Unit*/) {
+    fun bind(item: ArticleItemData, listener: OnArticleListener) {
 
         tv_date.text = item.date.shortFormat()
         tv_author.text = item.author
@@ -289,6 +290,6 @@ class ArticleItemView constructor(
         tv_comments_count.text = "${item.commentCount}"
         tv_read_duration.text = "${item.readDuration} min read"
         iv_bookmark.isChecked = item.isBookmark
-        //iv_bookmark.setOnClickListener { toggleBookmarkListener.invoke(item.id, item.isBookmark) }
+        //iv_bookmark.setOnClickListener { listener.bookmarksClick(item.id, item.isBookmark) }
     }
 }

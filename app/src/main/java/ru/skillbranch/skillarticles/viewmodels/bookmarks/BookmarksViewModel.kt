@@ -67,7 +67,7 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
 
     private fun itemAtEndHandle(lastLoadArticle: ArticleItemData) {
         viewModelScope.launch(Dispatchers.IO) {
-            val items = repository.loadArticlesFromNetwork(
+            val items = repository.loadBookmarksFromNetwork(
                 start = lastLoadArticle.id.toInt().inc(),
                 size = listConfig.pageSize
             )
@@ -91,10 +91,10 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
     private fun zeroLoadingHandle() {
         notify(Notify.TextMessage("Storage is empty"))
         viewModelScope.launch(Dispatchers.IO) {
-            val items = repository.loadArticlesFromNetwork(
+            val items = repository.loadBookmarksFromNetwork(
                 start = 0,
                 size = listConfig.initialLoadSizeHint
-            )
+            ).filter { it.isBookmark }
             if(items.isNotEmpty()) {
                 repository.insertArticlesToDb(items)
                 listData.value?.dataSource?.invalidate()

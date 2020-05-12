@@ -1,6 +1,5 @@
 package ru.skillbranch.skillarticles.data.repositories
 
-import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.paging.PositionalDataSource
 import ru.skillbranch.skillarticles.data.LocalDataHolder
@@ -20,10 +19,10 @@ object ArticlesRepository {
         ArticlesDataFactory(ArticleStrategy.SearchArticle(::searchArticleByTitle, searchQuery))
 
     fun allBookmarks() : ArticlesDataFactory =
-        ArticlesDataFactory(ArticleStrategy.BookmarkArticles(::searchArticleByRange))
+        ArticlesDataFactory(ArticleStrategy.BookmarkArticles(::searchBookmarksByRange))
 
     fun searchBookmarks(searchQuery: String) : ArticlesDataFactory =
-        ArticlesDataFactory(ArticleStrategy.SearchBookmarks(::searchArticleByTitle, searchQuery))
+        ArticlesDataFactory(ArticleStrategy.SearchBookmarks(::searchBookmarksByTitle, searchQuery))
 
     private fun searchArticleByTitle(start: Int, size: Int, queryTitle: String) = local.localArticleItems
         .asSequence()
@@ -33,6 +32,23 @@ object ArticlesRepository {
         .toList()
 
     private fun searchArticleByRange(start: Int, size: Int) = local.localArticleItems
+        .drop(start)
+        .take(size)
+
+    private fun searchBookmarksByRange(start: Int, size: Int) = local.localArticleItems
+        .filter { it.isBookmark }
+        .drop(start)
+        .take(size)
+
+    private fun searchBookmarksByTitle(start: Int, size: Int, queryTitle: String) = local.localArticleItems
+        .asSequence()
+        .filter { it.isBookmark && it.title.contains(queryTitle, true) }
+        .drop(start)
+        .take(size)
+        .toList()
+
+    fun loadBookmarksFromNetwork(start: Int, size: Int) : List<ArticleItemData> = local.localArticleItems
+        .filter { it.isBookmark }
         .drop(start)
         .take(size)
 
@@ -47,7 +63,7 @@ object ArticlesRepository {
     }
 
     fun updateBookmark(id: String, checked: Boolean) {
-
+        local.localArticleItems.find { it.id == id }?.isBookmark = checked
     }
 }
 
@@ -100,7 +116,7 @@ sealed class ArticleStrategy() {
         private val itemProvider: (Int, Int) -> List<ArticleItemData>
     ) : ArticleStrategy() {
         override fun getItems(start: Int, size: Int): List<ArticleItemData> {
-            return itemProvider(start, size).filter { it.isBookmark }
+            return itemProvider(start, size)
         }
     }
 
@@ -109,7 +125,7 @@ sealed class ArticleStrategy() {
         private val query: String
     ) : ArticleStrategy() {
         override fun getItems(start: Int, size: Int): List<ArticleItemData> {
-            return itemProvider(start, size, query).filter { it.isBookmark }
+            return itemProvider(start, size, query)
         }
     }
 }
