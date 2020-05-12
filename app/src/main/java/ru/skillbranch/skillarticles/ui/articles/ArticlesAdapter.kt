@@ -44,7 +44,8 @@ class ArticleVH(override val containerView: View) : RecyclerView.ViewHolder(cont
         (containerView as ArticleItemView).bind(item!!, bookmarkListener)
 
         containerView.iv_bookmark.setOnClickListener {
-            bookmarkListener.bookmarksClick(item.id, item.isBookmark.not())
+            containerView.iv_bookmark.toggle()
+            bookmarkListener.bookmarksClick(item, adapterPosition)
         }
 
         itemView.setOnClickListener { listener(item!!) }

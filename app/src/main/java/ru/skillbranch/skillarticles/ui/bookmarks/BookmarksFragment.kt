@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_bookmarks.*
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.listeners.OnArticleListener
 import ru.skillbranch.skillarticles.ui.articles.ArticlesAdapter
 import ru.skillbranch.skillarticles.ui.base.*
@@ -98,8 +99,8 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
 
     override fun setupViews() {
         articlesAdapter.bookmarkListener = object : OnArticleListener {
-            override fun bookmarksClick(itemId: String, isChecked: Boolean) {
-                viewModel.handleToggleBookmark(itemId, isChecked)
+            override fun bookmarksClick(item: ArticleItemData, position: Int) {
+                viewModel.handleToggleBookmark(item.id, item.isBookmark.not())
             }
         }
 

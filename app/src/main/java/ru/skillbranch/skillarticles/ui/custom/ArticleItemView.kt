@@ -290,6 +290,12 @@ class ArticleItemView constructor(
         tv_comments_count.text = "${item.commentCount}"
         tv_read_duration.text = "${item.readDuration} min read"
         iv_bookmark.isChecked = item.isBookmark
-        //iv_bookmark.setOnClickListener { listener.bookmarksClick(item.id, item.isBookmark) }
+/*        iv_bookmark.setOnClickListener {
+            item.isBookmark = iv_bookmark.isChecked.not()
+            iv_bookmark.toggle()
+            //iv_bookmark.isChecked = iv_bookmark.isChecked.not()
+            //iv_bookmark.invalidate()
+            listener.bookmarksClick(item.id, item.isBookmark)
+        }*/
     }
 }
