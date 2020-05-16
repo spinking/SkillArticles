@@ -15,7 +15,7 @@ import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.shortFormat
-import ru.skillbranch.skillarticles.listeners.OnArticleListener
+import ru.skillbranch.skillarticles.ui.articles.OnArticleListener
 import kotlin.math.max
 
 class ArticleItemView constructor(

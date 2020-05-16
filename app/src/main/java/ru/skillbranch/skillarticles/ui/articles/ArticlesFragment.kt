@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_articles.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.models.ArticleItemData
-import ru.skillbranch.skillarticles.listeners.OnArticleListener
 import ru.skillbranch.skillarticles.ui.base.*
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesState
@@ -133,4 +132,8 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
         //TODO save UI
     }
+}
+
+interface OnArticleListener {
+    fun bookmarksClick(item: ArticleItemData, position: Int)
 }
