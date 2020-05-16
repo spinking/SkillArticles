@@ -110,10 +110,15 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
         updateState { it.copy(isSearch = isSearch) }
     }
 
-    fun handleToggleBookmark(id: String, isChecked: Boolean) {
+    fun handleToggleBookmark(searchQuery: String?, id: String, isChecked: Boolean) {
         repository.updateBookmark(id, isChecked)
-    }
 
+        if (searchQuery != null) {
+            updateState { it.copy(searchQuery = searchQuery) }
+        } else {
+            listData.value?.dataSource?.invalidate()
+        }
+    }
 }
 
 data class BookmarksState(

@@ -6,6 +6,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.fragment_article.*
 import kotlinx.android.synthetic.main.fragment_bookmarks.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.models.ArticleItemData
@@ -100,8 +101,8 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
     override fun setupViews() {
         articlesAdapter.bookmarkListener = object : OnArticleListener {
             override fun bookmarksClick(item: ArticleItemData, position: Int) {
-                viewModel.handleToggleBookmark(item.id, item.isBookmark.not())
-                viewModel.handleSearch("")
+                viewModel.handleToggleBookmark(binding.searchQuery, item.id, item.isBookmark.not())
+                //viewModel.handleSearch(binding.searchQuery)
             }
         }
 
