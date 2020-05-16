@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -115,8 +116,10 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(),
         et_comment.setOnEditorActionListener { view, _, _ ->
             root.hideKeyboard(view)
             viewModel.handleSendComment(view.text.toString())
-            view.text = null
-            view.clearFocus()
+            if (binding.isCommentSaved.not()) {
+                view.text = null
+                view.clearFocus()
+            }
             true
         }
 
@@ -133,6 +136,10 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(),
             layoutManager = LinearLayoutManager(requireContext())
             adapter = commentsAdapter
         }
+
+/*        if (binding.lastComment != null) {
+            et_comment.setText(binding.lastComment)
+        }*/
 
         viewModel.observeList(viewLifecycleOwner) { commentsAdapter.submitList(it) }
     }
@@ -291,6 +298,8 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(),
             if(submenu.isOpen) submenu.isVisible = it
         }
 
+        var isCommentSaved: Boolean = false
+
         override val afterInflated: (() -> Unit)? = {
             dependsOn<Boolean, Boolean, List<Pair<Int, Int>>, Int>(
                 ::isLoadingContent,
@@ -329,6 +338,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(),
 
             answerTo = data.answerTo ?: "Comment"
             isShowBottombar = data.showBottomBar
+            isCommentSaved =  data.isCommentSaved
 
         }
 
