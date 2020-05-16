@@ -101,6 +101,7 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
         articlesAdapter.bookmarkListener = object : OnArticleListener {
             override fun bookmarksClick(item: ArticleItemData, position: Int) {
                 viewModel.handleToggleBookmark(item.id, item.isBookmark.not())
+                viewModel.handleSearch("")
             }
         }
 
