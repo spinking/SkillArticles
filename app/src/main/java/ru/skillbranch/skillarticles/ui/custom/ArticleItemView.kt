@@ -11,11 +11,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import ru.skillbranch.skillarticles.R
-import ru.skillbranch.skillarticles.data.models.ArticleItemData
+import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.shortFormat
-import ru.skillbranch.skillarticles.ui.articles.OnArticleListener
 import kotlin.math.max
 
 class ArticleItemView constructor(
@@ -25,7 +24,7 @@ class ArticleItemView constructor(
     private val iv_category: ImageView
     private val iv_likes: ImageView
     private val iv_comments: ImageView
-    val iv_bookmark: CheckableImageView
+    private val iv_bookmark: CheckableImageView
     private val tv_date: TextView
     private val tv_author: TextView
     private val tv_title: TextView
@@ -78,7 +77,7 @@ class ArticleItemView constructor(
         addView(iv_poster)
 
         iv_category = ImageView(context).apply {
-            id = R.id.tv_author
+            id = R.id.iv_category
             layoutParams = LayoutParams(categorySize, categorySize)
         }
         addView(iv_category)
@@ -91,7 +90,7 @@ class ArticleItemView constructor(
         addView(tv_description)
 
         iv_likes = ImageView(context).apply {
-            id = R.id.tv_author
+            id = R.id.iv_likes
             layoutParams = LayoutParams(iconSize, iconSize)
             imageTintList = ColorStateList.valueOf(grayColor)
             setImageResource(R.drawable.ic_favorite_black_24dp)
@@ -267,7 +266,7 @@ class ArticleItemView constructor(
         )
     }
 
-    fun bind(item: ArticleItemData, listener: OnArticleListener) {
+    fun bind(item: ArticleItem, listener: (ArticleItem, Boolean) -> Unit) {
 
         tv_date.text = item.date.shortFormat()
         tv_author.text = item.author
@@ -290,12 +289,7 @@ class ArticleItemView constructor(
         tv_comments_count.text = "${item.commentCount}"
         tv_read_duration.text = "${item.readDuration} min read"
         iv_bookmark.isChecked = item.isBookmark
-/*        iv_bookmark.setOnClickListener {
-            item.isBookmark = iv_bookmark.isChecked.not()
-            iv_bookmark.toggle()
-            //iv_bookmark.isChecked = iv_bookmark.isChecked.not()
-            //iv_bookmark.invalidate()
-            listener.bookmarksClick(item.id, item.isBookmark)
-        }*/
+        iv_bookmark.setOnClickListener { listener.invoke(item, true) }
+        this.setOnClickListener { listener.invoke(item, false) }
     }
 }
