@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.viewmodels.article
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -7,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.skillbranch.skillarticles.data.models.CommentItemData
+import ru.skillbranch.skillarticles.data.remote.res.CommentRes
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.data.repositories.CommentsDataFactory
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
@@ -34,13 +36,14 @@ class ArticleViewModel(
             .build()
     }
 
-    private val listData: LiveData<PagedList<CommentItemData>> = Transformations.switchMap(repository.findArticleCommentCount(articleId)) {
-        buildPagedList(repository.loadAllComments(articleId, it))
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val listData: LiveData<PagedList<CommentRes>> = repository.findArticleCommentCount(articleId).switchMap {
+        buildPagedList(repository.loadAllComments(articleId, it, ::commentLoadErrorHandler))
     }
 
     init {
+        fetchContent()
         subscribeOnDataSource(repository.findArticle(articleId)) { article, state ->
-            if (article.content == null) fetchContent()
             state.copy(
                 shareLink = article.shareLink,
                 title = article.title,
@@ -69,8 +72,19 @@ class ArticleViewModel(
         }
     }
 
+    fun refresh() {
+        launchSafety {
+            launch { repository.fetchArticleContent(articleId) }
+            launch { repository.refreshCommentsCount(articleId) }
+        }
+    }
+
+    private fun commentLoadErrorHandler(throwable: Throwable) {
+        //TODO handle network errors this
+    }
+
     private fun fetchContent() {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchSafety {
             repository.fetchArticleContent(articleId)
         }
     }
@@ -89,31 +103,29 @@ class ArticleViewModel(
     }
 
     override fun handleLike() {
-        val isLiked = currentState.isLike
-        val msg = if (!isLiked) Notify.TextMessage("Mark is liked")
-        else {
-            Notify.ActionMessage(
-                "Don't like it anymore",
-                "No, still like it"
-            ) { handleLike() }
-        }
+        launchSafety {
+            val isLiked = repository.toggleLike(articleId)
 
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.toggleLike(articleId)
-            if (isLiked) repository.decrementLike(articleId) else repository.incrementLike(articleId)
-            withContext(Dispatchers.Main) {
-                notify(msg)
+            if (isLiked) repository.incrementLike(articleId)
+            else repository.decrementLike(articleId)
+
+            val msg = if (isLiked) Notify.TextMessage("Articles marked as liked")
+            else {
+                Notify.ActionMessage(
+                    "Don't like it anymore",
+                    "No, still like it"
+                ) { handleLike() }
             }
+            notify(msg)
         }
     }
 
     override fun handleBookmark() {
-        val msg = if (currentState.isBookmark) "Add to bookmarks" else "Remove from bookmarks"
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.toggleBookmark(articleId)
-            withContext(Dispatchers.Main) {
-                notify(Notify.TextMessage(msg))
-            }
+        launchSafety {
+            val isBookmarked = repository.toggleBookmark(articleId)
+
+            val msg = if (isBookmarked) "Add to bookmarks" else "Remove from bookmarks"
+            notify(Notify.TextMessage(msg))
         }
     }
 
@@ -152,32 +164,39 @@ class ArticleViewModel(
     }
 
     fun handleSendComment(comment: String?) {
-        updateState { it.copy(comment = comment) }
-
-        if (comment.isNullOrBlank()) {
-            notify(Notify.TextMessage("Comment must not be empty"))
+        if (comment == null) {
+            notify(Notify.TextMessage("Comment must be not empty"))
             return
         }
-
+        updateState { it.copy(commentText = comment) }
         if (!currentState.isAuth) {
             navigate(NavigationCommand.StartLogin())
-            return
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.sendMessage(articleId, comment, currentState.answerToSlug)
-            withContext(Dispatchers.Main) {
-                updateState { it.copy(answerTo = null, answerToSlug = null, comment = null) }
+        } else {
+            launchSafety(null, {
+                updateState {
+                    it.copy(
+                        answerTo = null,
+                        answerToMessageId = null,
+                        commentText = null
+                    )
+                }
+            }) {
+                repository.sendMessage(
+                    articleId,
+                    currentState.commentText!!,
+                    currentState.answerToMessageId
+                )
             }
+
         }
     }
 
-    fun observeList(owner: LifecycleOwner, onChanged: (list: PagedList<CommentItemData>) -> Unit) {
+    fun observeList(owner: LifecycleOwner, onChanged: (list: PagedList<CommentRes>) -> Unit) {
         listData.observe(owner, Observer { onChanged(it) })
     }
 
-    private fun buildPagedList(dataFactory: CommentsDataFactory): LiveData<PagedList<CommentItemData>> {
-        return LivePagedListBuilder<String, CommentItemData>(dataFactory, listConfig)
+    private fun buildPagedList(dataFactory: CommentsDataFactory): LiveData<PagedList<CommentRes>> {
+        return LivePagedListBuilder<String, CommentRes>(dataFactory, listConfig)
             .setFetchExecutor(Executors.newSingleThreadExecutor())
             .build()
     }
@@ -187,11 +206,11 @@ class ArticleViewModel(
     }
 
     fun handleClearComment() {
-        updateState { it.copy(answerTo = null, answerToSlug = null) }
+        updateState { it.copy(answerTo = null, answerToMessageId = null) }
     }
 
     fun handleReplyTo(slug: String, name: String) {
-        updateState { it.copy(answerToSlug = slug, answerTo = "Reply to $name") }
+        updateState { it.copy(answerToMessageId = slug, answerTo = "Reply to $name") }
     }
 
 }
@@ -219,9 +238,9 @@ data class ArticleState(
     val content: List<MarkdownElement> = emptyList(),
     val commentsCount: Int = 0,
     val answerTo: String? = null,
-    val answerToSlug: String? = null,
+    val answerToMessageId: String? = null,
     val showBottomBar: Boolean = true,
-    val comment: String? = null,
+    val commentText: String? = null,
     val hashtags: List<String> = emptyList(),
     val source: String? = null
 ): IViewModelState {
@@ -230,14 +249,20 @@ data class ArticleState(
         outState.set("searchQuery", searchQuery)
         outState.set("searchResults", searchResults)
         outState.set("searchPosition", searchPosition)
+        outState.set("commentText", commentText)
+        outState.set("answerTo", answerTo)
+        outState.set("answerToSlug", answerToMessageId)
     }
 
-    override fun restore(savedState: SavedStateHandle): IViewModelState {
+    override fun restore(savedState: SavedStateHandle): ArticleState {
         return copy(
             isSearch = savedState["isSearch"] ?: false,
             searchQuery = savedState["searchQuery"],
             searchResults = savedState["searchResults"] ?: emptyList(),
-            searchPosition = savedState["searchPosition"] ?: 0
+            searchPosition = savedState["searchPosition"] ?: 0,
+            commentText = savedState["commentText"],
+            answerTo = savedState["answerTo"],
+            answerToMessageId = savedState["answerToSlug"]
         )
     }
 }

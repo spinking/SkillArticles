@@ -9,13 +9,16 @@ import android.view.MenuItem
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.isVisible
 import androidx.cursoradapter.widget.CursorAdapter
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.fragment_articles.*
+import kotlinx.android.synthetic.main.search_view_layout.view.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.local.entities.CategoryData
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
@@ -26,6 +29,7 @@ import ru.skillbranch.skillarticles.ui.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesState
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Loading
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 
 class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
@@ -96,6 +100,11 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         suggestionsAdapter.setFilterQueryProvider { constraint -> populateAdapter(constraint) }
 
         setHasOptionsMenu(true)
+    }
+
+    override fun onDestroyView() {
+        toolbar.search_view?.setOnQueryTextListener(null)
+        super.onDestroyView()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -170,6 +179,17 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
         viewModel.observeCategories(viewLifecycleOwner) { categories ->
             binding.categories = categories
+        }
+    }
+
+    override fun renderLoading(loadingState: Loading) {
+        when(loadingState){
+            Loading.SHOW_LOADING -> if(!refresh.isRefreshing) root.progress.isVisible = true
+            Loading.SHOW_BLOCKING_LOADING -> root.progress.isVisible = false
+            Loading.HIDE_LOADING ->{
+                root.progress.isVisible = false
+                if(refresh.isRefreshing) refresh.isRefreshing = false
+            }
         }
     }
 
