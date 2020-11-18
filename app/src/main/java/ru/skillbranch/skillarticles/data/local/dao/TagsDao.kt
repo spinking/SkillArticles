@@ -10,10 +10,8 @@ import ru.skillbranch.skillarticles.data.local.entities.Tag
 
 @Dao
 interface TagsDao : BaseDao<Tag> {
-    @Query("""
-        SELECT tag FROM article_tags
-        ORDER BY use_count DESC
-    """)
+
+    @Query("SELECT tag FROM article_tags ORDER BY use_count DESC")
     fun findTags(): LiveData<List<String>>
 
     @Query("""

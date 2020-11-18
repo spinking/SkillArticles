@@ -14,22 +14,25 @@ object DbManager {
         App.applicationContext(),
         AppDb::class.java,
         AppDb.DATABASE_NAME
-    ).build()
+    )
+        .run { if (BuildConfig.DEBUG) fallbackToDestructiveMigration() else this }
+        .build()
 }
 
 @Database(
-    entities = [Article::class,
-    ArticleCounts::class,
-    Category::class,
-    ArticlePersonalInfo::class,
-    Tag::class,
-    ArticleTagXRef::class,
-    ArticleContent::class],
+    entities = [
+        Article::class,
+        ArticleCounts::class,
+        Category::class,
+        ArticlePersonalInfo::class,
+        Tag::class,
+        ArticleTagXRef::class,
+        ArticleContent::class
+    ],
     version = AppDb.DATABASE_VERSION,
-    exportSchema = true,
+    exportSchema = false,
     views = [ArticleItem::class, ArticleFull::class]
 )
-
 @TypeConverters(DateConverter::class)
 abstract class AppDb : RoomDatabase() {
     companion object {
@@ -37,10 +40,10 @@ abstract class AppDb : RoomDatabase() {
         const val DATABASE_VERSION = 1
     }
 
-    abstract fun articlesDao() : ArticlesDao
-    abstract fun articleCountsDao() : ArticleCountsDao
-    abstract fun categoriesDao() : CategoriesDao
-    abstract fun articlePersonalInfosDao() : ArticlePersonalInfosDao
-    abstract fun tagsDao() : TagsDao
-    abstract fun articleContentsDao() : ArticleContentsDao
+    abstract fun articlesDao(): ArticlesDao
+    abstract fun articleCountsDao(): ArticleCountsDao
+    abstract fun categoriesDao(): CategoriesDao
+    abstract fun articlePersonalInfosDao(): ArticlePersonalInfosDao
+    abstract fun tagsDao(): TagsDao
+    abstract fun articleContentsDao(): ArticleContentsDao
 }

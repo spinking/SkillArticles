@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/action_filter"
-        android:icon="@drawable/ic_filter_list_black_24"
+        android:icon="@drawable/ic_filter"
         android:title="Фильтр"
         app:actionLayout="@layout/search_view_layout"
         app:showAsAction="always|collapseActionView" />
