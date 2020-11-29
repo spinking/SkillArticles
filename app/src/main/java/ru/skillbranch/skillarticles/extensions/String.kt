@@ -9,3 +9,18 @@ fun String?.indexesOf(substr: String, ignoreCase: Boolean = true): List<Int> {
     }
     return res
 }
+
+fun String.isValidEmail(): Boolean {
+    val regex = "^\\S+@\\S+\\.\\S+$".toRegex()
+    return regex.matches(this)
+}
+
+fun String.isValidPassword(): Boolean {
+    val regex = "^[a-zA-Z0-9]{8,}\$".toRegex()
+    return regex.matches(this)
+}
+
+fun String.isValidName(): Boolean {
+    val regex = "^[a-zA-Z0-9_-]{2,}\$".toRegex()
+    return regex.matches(this)
+}

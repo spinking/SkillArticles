@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_articles">
+    app:startDestination="@id/auth">
 
     <fragment
         android:id="@+id/page_article"
@@ -95,12 +95,25 @@
                 android:name="private_destination"
                 app:argType="integer"
                 android:defaultValue="-1" />
+            <action
+                android:id="@+id/action_nav_auth_to_registrationFragment"
+                app:destination="@id/registrationFragment" />
         </fragment>
         <fragment
             android:id="@+id/page_privacy_policy"
             android:name="ru.skillbranch.skillarticles.ui.auth.PrivacyPolicyFragment"
             android:label="@string/title_privacy_policy"
             tools:layout="@layout/fragment_privacy_policy" />
+        <fragment
+            android:id="@+id/registrationFragment"
+            android:name="ru.skillbranch.skillarticles.ui.auth.RegistrationFragment"
+            android:label="@string/title_registration"
+            tools:layout="@layout/fragment_registration" >
+            <argument
+                android:name="private_destination"
+                app:argType="integer"
+                android:defaultValue="-1" />
+        </fragment>
     </navigation>
 
     <!--global actions -->
@@ -111,6 +124,11 @@
         android:id="@+id/finish_login"
         app:popUpTo="@id/auth"
         app:popUpToInclusive="true"/>
+    <action
+        android:id="@+id/finish_registration"
+        app:popUpTo="@id/auth"
+        app:popUpToInclusive="true"
+        />
     <dialog
         android:id="@+id/dialog_chose_category"
         android:name="ru.skillbranch.skillarticles.ui.dialogs.ChoseCategoryDialog"

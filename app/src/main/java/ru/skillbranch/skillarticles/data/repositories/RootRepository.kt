@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.local.PrefManager
 import ru.skillbranch.skillarticles.data.remote.NetworkManager
 import ru.skillbranch.skillarticles.data.remote.req.LoginReq
+import ru.skillbranch.skillarticles.data.remote.req.RegisterReq
+import kotlin.math.log
 
 object RootRepository {
     private val preferences = PrefManager
@@ -16,5 +18,14 @@ object RootRepository {
         preferences.profile = auth.user
         preferences.accessToken = "Bearer ${auth.accessToken}"
         preferences.refreshToken = auth.refreshToken
+    }
+
+    suspend fun register(name: String, login: String, password: String) {
+        val register = network.register(RegisterReq(name, login, password))
+        preferences.apply {
+            profile = register.user
+            accessToken = "Bearer ${register.accessToken}"
+            refreshToken = register.refreshToken
+        }
     }
 }

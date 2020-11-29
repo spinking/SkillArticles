@@ -66,6 +66,11 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
                 navigationCommand.privateDestination?.let { navController.navigate(it) }
             }
 
+            is NavigationCommand.FinishRegistration -> {
+                navController.navigate(R.id.finish_registration)
+                navigationCommand.privateDestination?.let { navController.navigate(it) }
+            }
+
             is NavigationCommand.StartLogin -> {
                 navController.navigate(
                     R.id.start_login,
