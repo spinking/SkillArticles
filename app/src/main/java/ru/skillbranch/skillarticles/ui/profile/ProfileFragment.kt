@@ -1,10 +1,20 @@
 package ru.skillbranch.skillarticles.ui.profile
 
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.fragment_profile.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
@@ -12,11 +22,14 @@ import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.profile.PendingAction
 import ru.skillbranch.skillarticles.viewmodels.profile.ProfileState
 import ru.skillbranch.skillarticles.viewmodels.profile.ProfileViewModel
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ProfileFragment : BaseFragment<ProfileViewModel>() {
 
     override val viewModel: ProfileViewModel by viewModels()
-    override val layout: Int = ru.skillbranch.skillarticles.R.layout.fragment_profile
+    override val layout: Int = R.layout.fragment_profile
     override val binding: ProfileBinding by lazy { ProfileBinding() }
 
     private val permissionsResultCallback = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {result ->
@@ -34,6 +47,27 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
         //result after get back from settings
     }
 
+    private val cameraResultCallback =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
+            val (payload) = binding.pendingAction as PendingAction.CameraAction
+            if (result) {
+                val inputStream = requireContext().contentResolver.openInputStream(payload)
+                viewModel.handleUploadPhoto(inputStream)
+            } else {
+                removeTempUri(payload)
+            }
+        }
+
+    private val editPhotoResultCallback = registerForActivityResult(EditImageContract()) {result ->
+        if (result != null) {
+            val inputSteam = requireContext().contentResolver.openInputStream(result)
+            viewModel.handleUploadPhoto(inputSteam)
+        } else {
+            val (payload) = binding.pendingAction as PendingAction.EditAction
+            removeTempUri(payload.second)
+        }
+    }
+
     private val galleryResultCallback = registerForActivityResult(ActivityResultContracts.GetContent()) {result ->
         if (result != null) {
             val inputStream = requireContext().contentResolver.openInputStream(result)
@@ -48,7 +82,17 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
 
     override fun setupViews() {
         iv_avatar.setOnClickListener {
-            viewModel.handleTestAction()
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                //Glide submit get it is sync call,don't call on UI thread
+                val sourceFile = Glide.with(requireActivity()).asFile().load(binding.avatar).submit().get()
+                val sourceUri = FileProvider.getUriForFile(requireContext(),  "${requireContext().packageName}.provider", sourceFile)
+
+                val uri = prepareTempUri()
+                withContext(Dispatchers.Main) {
+                    viewModel.handleTestAction(sourceUri, uri)
+                }
+            }
         }
 
         viewModel.observerPermissions(viewLifecycleOwner) {
@@ -59,15 +103,49 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
             when(it) {
                 is PendingAction.GalleryAction -> galleryResultCallback.launch(it.payload)
                 is PendingAction.SettingsAction -> settingsResultCallback.launch(it.payload)
+                is PendingAction.CameraAction -> cameraResultCallback.launch(it.payload)
+                is PendingAction.EditAction -> editPhotoResultCallback.launch(it.payload)
             }
         }
     }
 
     private fun updateAvatar(avatarUrl:String){
-        //TODO update avatar with Glide this
+        if(avatarUrl.isBlank()) {
+            Glide.with(this)
+                .load(R.drawable.ic_avatar)
+                .into(iv_avatar
+                )
+        } else {
+            Glide.with(this)
+                .load(avatarUrl)
+                .placeholder(R.drawable.ic_avatar)
+                .apply(RequestOptions.circleCropTransform())
+                .into(iv_avatar)
+        }
+    }
+
+    private fun prepareTempUri(): Uri {
+        val timestamp = SimpleDateFormat("HHmmss").format(Date())
+        val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val tempFile = File.createTempFile(
+            "JPEG_${timestamp}",
+            ".jpg",
+            storageDir
+        )
+
+        val contentUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", tempFile)
+        return contentUri
+    }
+
+    private fun removeTempUri(payload: Uri) {
+        requireContext().contentResolver.delete(payload, null, null)
     }
 
     inner class ProfileBinding: Binding() {
+
+        var pendingAction: PendingAction? = null
+
+
         var avatar by RenderProp(""){
             updateAvatar(it)
         }
@@ -95,6 +173,7 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
             if(data.about!=null) about = data.about
             rating = data.rating
             respect = data.respect
+            pendingAction = data.pendingAction
         }
     }
 }

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
+import android.os.Parcel
 import android.os.Parcelable
 import android.provider.Settings
 import android.service.voice.AlwaysOnHotwordDetector
@@ -44,8 +45,8 @@ class ProfileViewModel(handle: SavedStateHandle) : BaseViewModel<ProfileState>(h
         activityResult.value = Event(action)
     }
 
-    fun handleTestAction() {
-        val pendingAction = PendingAction.GalleryAction("image/jpeg")
+    fun handleTestAction(source: Uri, destination: Uri) {
+        val pendingAction = PendingAction.EditAction(source to destination)
         updateState { it.copy(pendingAction = pendingAction) }
         requestPermissions(storagePermissions)
     }
@@ -124,4 +125,29 @@ sealed class PendingAction() : Parcelable {
     data class GalleryAction(override val payload: String) : PendingAction()
     @Parcelize
     data class SettingsAction(override val payload: Intent) : PendingAction()
+    @Parcelize
+    data class CameraAction(override val payload: Uri) : PendingAction()
+
+    data class EditAction(override val payload: Pair<Uri, Uri>) : PendingAction(), Parcelable {
+        constructor(parcel: Parcel) : this(Uri.parse(parcel.readString()) to Uri.parse(parcel.readString()))
+
+        override fun writeToParcel(parcel: Parcel, flags: Int) {
+            parcel.writeString(payload.first.toString())
+            parcel.writeString(payload.second.toString())
+        }
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        companion object CREATOR : Parcelable.Creator<EditAction> {
+            override fun createFromParcel(parcel: Parcel): EditAction {
+                return EditAction(parcel)
+            }
+
+            override fun newArray(size: Int): Array<EditAction?> {
+                return arrayOfNulls(size)
+            }
+        }
+    }
 }
