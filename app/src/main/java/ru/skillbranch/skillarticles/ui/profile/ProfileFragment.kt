@@ -1,8 +1,13 @@
 package ru.skillbranch.skillarticles.ui.profile
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -31,52 +36,27 @@ import java.util.*
 
 class ProfileFragment : BaseFragment<ProfileViewModel>() {
 
+    private lateinit var resultRegistry: ActivityResultRegistry
     override val viewModel: ProfileViewModel by viewModels()
     override val layout: Int = R.layout.fragment_profile
     override val binding: ProfileBinding by lazy { ProfileBinding() }
 
-    private val permissionsResultCallback = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {result ->
-        val permissionsResult = result.mapValues { (permission, isGranted ) ->
-            if (isGranted) true to true
-            else false to ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(),
-                permission
-            )
-        }
-        viewModel.handlePermission(permissionsResult)
-    }
+    lateinit var permissionLauncher: ActivityResultLauncher<Array<out String>>
+    lateinit var cameraLauncher: ActivityResultLauncher<Uri>
+    lateinit var galleryLauncher: ActivityResultLauncher<String>
+    lateinit var editPhotoLauncher: ActivityResultLauncher<Pair<Uri, Uri>>
+    lateinit var settingsLauncher: ActivityResultLauncher<Intent>
 
-    private val settingsResultCallback = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        //result after get back from settings
-    }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
 
-    private val cameraResultCallback =
-        registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
-            val (payload) = binding.pendingAction as PendingAction.CameraAction
-            if (result) {
-                val inputStream = requireContext().contentResolver.openInputStream(payload)
-                viewModel.handleUploadPhoto(inputStream)
-            } else {
-                removeTempUri(payload)
-            }
-        }
+        if (::resultRegistry.isInitialized.not()) resultRegistry = requireActivity().activityResultRegistry
 
-    private val editPhotoResultCallback = registerForActivityResult(EditImageContract()) {result ->
-        if (result != null) {
-            val inputSteam = requireContext().contentResolver.openInputStream(result)
-            viewModel.handleUploadPhoto(inputSteam)
-        } else {
-            val (payload) = binding.pendingAction as PendingAction.EditAction
-            removeTempUri(payload.second)
-        }
-    }
-
-    private val galleryResultCallback = registerForActivityResult(ActivityResultContracts.GetContent()) {result ->
-        if (result != null) {
-            val inputStream = requireContext().contentResolver.openInputStream(result)
-            viewModel.handleUploadPhoto(inputStream)
-        }
-
+        permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(), resultRegistry, ::callbackPermissions)
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture(), resultRegistry, ::callbackCamera)
+        galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent(), resultRegistry, ::callbackGallery)
+        editPhotoLauncher = registerForActivityResult(EditImageContract(), resultRegistry, ::callbackEditPhoto)
+        settingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), resultRegistry, ::callbackSettings)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,17 +88,70 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
         }
 
         viewModel.observerPermissions(viewLifecycleOwner) {
-            permissionsResultCallback.launch(it.toTypedArray())
+            permissionLauncher.launch(it.toTypedArray())
         }
 
         viewModel.observeActivityResults(viewLifecycleOwner) {
             when(it) {
-                is PendingAction.GalleryAction -> galleryResultCallback.launch(it.payload)
-                is PendingAction.SettingsAction -> settingsResultCallback.launch(it.payload)
-                is PendingAction.CameraAction -> cameraResultCallback.launch(it.payload)
-                is PendingAction.EditAction -> editPhotoResultCallback.launch(it.payload)
+                is PendingAction.GalleryAction -> galleryLauncher.launch(it.payload)
+                is PendingAction.SettingsAction -> settingsLauncher.launch(it.payload)
+                is PendingAction.CameraAction -> cameraLauncher.launch(it.payload)
+                is PendingAction.EditAction -> editPhotoLauncher.launch(it.payload)
             }
         }
+    }
+
+    private fun callbackPermissions(result: Map<String, Boolean>) {
+        val permissionsResult = result.mapValues { (permission, isGranted ) ->
+            if (isGranted) true to true
+            else false to ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                permission
+            )
+        }
+
+        val isAllGranted = permissionsResult.values.map { it.first }.contains(false)
+        if (isAllGranted) {
+            val tempUri = when(val pendingAction = binding.pendingAction) {
+                is PendingAction.CameraAction -> pendingAction.payload
+                is PendingAction.EditAction -> pendingAction.payload.second
+                else -> null
+            }
+            removeTempUri(tempUri)
+        }
+
+        viewModel.handlePermission(permissionsResult)
+    }
+
+    private fun callbackCamera(result: Boolean) {
+        val (payload) = binding.pendingAction as PendingAction.CameraAction
+        if (result) {
+            val inputStream = requireContext().contentResolver.openInputStream(payload)
+            viewModel.handleUploadPhoto(inputStream)
+        } else {
+            removeTempUri(payload)
+        }
+    }
+
+    private fun callbackGallery(result: Uri?) {
+        if (result != null) {
+            val inputStream = requireContext().contentResolver.openInputStream(result)
+            viewModel.handleUploadPhoto(inputStream)
+        }
+    }
+
+    private fun callbackEditPhoto(result: Uri?) {
+        if (result != null) {
+            val inputStream = requireContext().contentResolver.openInputStream(result)
+            viewModel.handleUploadPhoto(inputStream)
+        } else {
+            val (payload) = binding.pendingAction as PendingAction.EditAction
+            removeTempUri(payload.second)
+        }
+    }
+
+    private fun callbackSettings(result: ActivityResult) {
+        //TODO do something
     }
 
     private fun updateAvatar(avatarUrl:String){
