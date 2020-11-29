@@ -2,16 +2,13 @@ package ru.skillbranch.skillarticles.ui
 
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
-import ru.skillbranch.skillarticles.extensions.selectItem
-import kotlinx.android.synthetic.main.layout_bottombar.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.selectDestination
+import ru.skillbranch.skillarticles.extensions.selectItem
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.ui.custom.Bottombar
 import ru.skillbranch.skillarticles.viewmodels.RootViewModel
@@ -38,7 +35,7 @@ class RootActivity : BaseActivity<RootViewModel>() {
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             nav_view.selectDestination(destination)
 
-            //if (destination.id == R.id.nav_auth) nav_view.selectItem(arguments?.get("private_destination") as Int?)
+            if (destination.id == R.id.nav_auth) nav_view.selectItem(arguments?.get("private_destination") as Int?)
 
             if (viewModel.currentState.isAuth && destination.id == R.id.nav_auth) {
                 controller.popBackStack()

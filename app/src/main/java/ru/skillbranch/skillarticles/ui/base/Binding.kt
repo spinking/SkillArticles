@@ -9,12 +9,11 @@ abstract class Binding {
     val delegates = mutableMapOf<String, RenderProp<out Any>>()
     var isInflated = false
 
-    open val afterInflated: (() -> Unit)? = null
+    open var afterInflated: (() -> Unit)? = null
     fun onFinishInflate() {
-        if(!isInflated) {
+        if (!isInflated) {
             afterInflated?.invoke()
             isInflated = true
-            rebind()
         }
     }
 

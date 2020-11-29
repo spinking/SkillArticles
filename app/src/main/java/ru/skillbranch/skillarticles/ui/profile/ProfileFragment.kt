@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.ui.profile
 
+import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.viewModels
@@ -30,7 +31,7 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
     }
 
     private val settingsResultCallback = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        //show dialog
+        //result after get back from settings
     }
 
     private val galleryResultCallback = registerForActivityResult(ActivityResultContracts.GetContent()) {result ->
@@ -39,6 +40,10 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
             viewModel.handleUploadPhoto(inputStream)
         }
 
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
     override fun setupViews() {
