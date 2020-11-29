@@ -153,7 +153,7 @@ class ArticleFilter(
             queryBuilder.appendWhere("refs.t_id = '$search'")
         }
         if (isBookmark) queryBuilder.appendWhere("is_bookmark = 1")
-        if (categories.isNotEmpty()) queryBuilder.appendWhere("category_id IN (${categories.joinToString(",")})")
+        if (categories.isNotEmpty()) queryBuilder.appendWhere("category_id IN (${categories.joinToString("\",\"", "\"", "\"")})")
 
         queryBuilder.orderBy("date")
         return queryBuilder.build()

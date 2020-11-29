@@ -1,17 +1,17 @@
 package ru.skillbranch.skillarticles.viewmodels.profile
 
 import android.Manifest
-import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 import android.provider.Settings
-import android.service.voice.AlwaysOnHotwordDetector
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -86,18 +86,40 @@ class ProfileViewModel(handle: SavedStateHandle) : BaseViewModel<ProfileState>(h
 
     fun handleUploadPhoto(inputStream: InputStream?) {
         inputStream ?: return
-        val byteArray = inputStream.use { input -> input.readBytes() }
+        launchSafety(null, {updateState { it.copy(pendingAction = null) }}) {
+            val byteArray: ByteArray =
+                withContext(Dispatchers.IO) { inputStream.use { input -> input.readBytes() } }
 
-        val reqFile: RequestBody = byteArray.toRequestBody("image/jpeg".toMediaType())
-        val body: MultipartBody.Part = MultipartBody.Part.createFormData("avatar", "name.jpg", reqFile)
+            val reqFile: RequestBody = byteArray.toRequestBody("image/jpeg".toMediaType())
+            val body: MultipartBody.Part = MultipartBody.Part.createFormData("avatar", "name.jpg", reqFile)
 
-        launchSafety {
             repository.uploadAvatar(body)
         }
     }
 
     fun observeActivityResults(owner: LifecycleOwner, handler: (action: PendingAction) -> Unit) {
         activityResult.observe(owner, EventObserver{ handler(it) })
+    }
+
+    fun handleEditAction(source: Uri, destination: Uri) {
+        updateState { it.copy(pendingAction = PendingAction.EditAction(source to destination)) }
+        requestPermissions(storagePermissions)
+    }
+
+    fun handleCameraAction(destination: Uri) {
+        updateState { it.copy(pendingAction = PendingAction.CameraAction(destination)) }
+        requestPermissions(storagePermissions)
+    }
+
+    fun handleGalleryAction() {
+        updateState { it.copy(pendingAction = PendingAction.GalleryAction("image/jpeg")) }
+        requestPermissions(storagePermissions)
+    }
+
+    fun handleDeleteAction() {
+        launchSafety {
+            repository.removeAvatar()
+        }
     }
 }
 

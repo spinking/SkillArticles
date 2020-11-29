@@ -6,6 +6,7 @@ import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -18,7 +19,9 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
+import ru.skillbranch.skillarticles.ui.dialogs.AvatarActionsDialog
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 import ru.skillbranch.skillarticles.viewmodels.profile.PendingAction
 import ru.skillbranch.skillarticles.viewmodels.profile.ProfileState
 import ru.skillbranch.skillarticles.viewmodels.profile.ProfileViewModel
@@ -78,21 +81,30 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setFragmentResultListener(AvatarActionsDialog.AVATAR_ACTIONS_KEY) {_, bundle ->
+            when(bundle[AvatarActionsDialog.SELECT_ACTION_KEY] as String) {
+                AvatarActionsDialog.CAMERA_KEY -> viewModel.handleCameraAction(prepareTempUri())
+                AvatarActionsDialog.GALLERY_KEY -> viewModel.handleGalleryAction()
+                AvatarActionsDialog.DELETE_KEY -> viewModel.handleDeleteAction()
+                AvatarActionsDialog.EDIT_KEY -> {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        //Glide submit get it is sync call,don't call on UI thread
+                        val sourceFile = Glide.with(requireActivity()).asFile().load(binding.avatar).submit().get()
+                        val sourceUri = FileProvider.getUriForFile(requireContext(),  "${requireContext().packageName}.provider", sourceFile)
+
+                        withContext(Dispatchers.Main) {
+                            viewModel.handleEditAction(sourceUri, prepareTempUri())
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun setupViews() {
         iv_avatar.setOnClickListener {
-
-            lifecycleScope.launch(Dispatchers.IO) {
-                //Glide submit get it is sync call,don't call on UI thread
-                val sourceFile = Glide.with(requireActivity()).asFile().load(binding.avatar).submit().get()
-                val sourceUri = FileProvider.getUriForFile(requireContext(),  "${requireContext().packageName}.provider", sourceFile)
-
-                val uri = prepareTempUri()
-                withContext(Dispatchers.Main) {
-                    viewModel.handleTestAction(sourceUri, uri)
-                }
-            }
+            val action = ProfileFragmentDirections.actionNavProfileToDialogAvatarActions(binding.avatar.isNotBlank())
+            viewModel.navigate(NavigationCommand.To(action.actionId, action.arguments))
         }
 
         viewModel.observerPermissions(viewLifecycleOwner) {
@@ -133,11 +145,11 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
             storageDir
         )
 
-        val contentUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", tempFile)
-        return contentUri
+        return FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", tempFile)
     }
 
-    private fun removeTempUri(payload: Uri) {
+    private fun removeTempUri(payload: Uri?) {
+        payload ?: return
         requireContext().contentResolver.delete(payload, null, null)
     }
 
