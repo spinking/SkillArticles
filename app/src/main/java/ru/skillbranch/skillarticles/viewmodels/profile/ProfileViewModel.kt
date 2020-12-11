@@ -71,7 +71,7 @@ class ProfileViewModel(handle: SavedStateHandle) : BaseViewModel<ProfileState>(h
         }
     }
 
-    private fun executeOpenSettings() {
+    fun executeOpenSettings() {
         val errHandler = {
              val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.parse("package:ru.skillbranch.skillarticles")
@@ -81,7 +81,7 @@ class ProfileViewModel(handle: SavedStateHandle) : BaseViewModel<ProfileState>(h
         notify(Notify.ErrorMessage("Need permissions for storage", "Open settings", errHandler))
     }
 
-    private fun executePendingAction() {
+    fun executePendingAction() {
         val pendingAction = currentState.pendingAction ?: return
         startForResult(pendingAction)
     }

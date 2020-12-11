@@ -42,7 +42,9 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
     var _mockFactory: ((SavedStateRegistryOwner) -> ViewModelProvider.Factory)? = null
 
     private lateinit var resultRegistry: ActivityResultRegistry
-    override val viewModel: ProfileViewModel by viewModels()
+    override val viewModel: ProfileViewModel by viewModels {
+        _mockFactory?.invoke(this) ?: defaultViewModelProviderFactory
+    }
     override val layout: Int = R.layout.fragment_profile
     override val binding: ProfileBinding by lazy { ProfileBinding() }
 
@@ -191,7 +193,7 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
     }
 
     @VisibleForTesting
-    private fun prepareTempUri(): Uri {
+    fun prepareTempUri(): Uri {
         val timestamp = SimpleDateFormat("HHmmss").format(Date())
         val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val tempFile = File.createTempFile(
@@ -204,7 +206,7 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
     }
 
     @VisibleForTesting
-    private fun removeTempUri(payload: Uri?) {
+    fun removeTempUri(payload: Uri?) {
         payload ?: return
         requireContext().contentResolver.delete(payload, null, null)
     }

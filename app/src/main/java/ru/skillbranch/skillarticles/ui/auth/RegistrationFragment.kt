@@ -23,7 +23,9 @@ class RegistrationFragment() : BaseFragment<AuthViewModel>() {
     var _mockFactory: ((SavedStateRegistryOwner)->ViewModelProvider.Factory)? = null
 
     override val layout: Int = R.layout.fragment_registration
-    override val viewModel: AuthViewModel by viewModels()
+    override val viewModel: AuthViewModel by viewModels {
+        _mockFactory?.invoke(this) ?: defaultViewModelProviderFactory
+    }
     private val args: RegistrationFragmentArgs by navArgs()
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
