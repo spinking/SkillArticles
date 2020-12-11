@@ -2,6 +2,7 @@ package ru.skillbranch.skillarticles.ui.base
 
 import android.os.Bundle
 import android.view.*
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.android.synthetic.main.activity_root.*
@@ -11,6 +12,8 @@ import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Loading
 
 abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment() {
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    var _mockRoot: RootActivity? = null
     val root: RootActivity
         get() = activity as RootActivity
     open val binding: Binding? = null

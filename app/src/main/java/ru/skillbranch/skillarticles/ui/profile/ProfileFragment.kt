@@ -9,11 +9,14 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.savedstate.SavedStateRegistryOwner
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.fragment_profile.*
@@ -21,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.ui.RootActivity
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
@@ -34,17 +38,34 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ProfileFragment : BaseFragment<ProfileViewModel>() {
+class ProfileFragment() : BaseFragment<ProfileViewModel>() {
+    var _mockFactory: ((SavedStateRegistryOwner) -> ViewModelProvider.Factory)? = null
 
     private lateinit var resultRegistry: ActivityResultRegistry
     override val viewModel: ProfileViewModel by viewModels()
     override val layout: Int = R.layout.fragment_profile
     override val binding: ProfileBinding by lazy { ProfileBinding() }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    constructor(
+        mockRoot: RootActivity,
+        testRegistry: ActivityResultRegistry? = null,
+        mockFactory: ((SavedStateRegistryOwner) -> ViewModelProvider.Factory)? = null
+    ) : this() {
+        _mockRoot = mockRoot
+        _mockFactory = mockFactory
+        if (testRegistry != null) resultRegistry = testRegistry
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var permissionLauncher: ActivityResultLauncher<Array<out String>>
+     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var cameraLauncher: ActivityResultLauncher<Uri>
+     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var galleryLauncher: ActivityResultLauncher<String>
+     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var editPhotoLauncher: ActivityResultLauncher<Pair<Uri, Uri>>
+     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var settingsLauncher: ActivityResultLauncher<Intent>
 
     override fun onAttach(context: Context) {
@@ -169,6 +190,7 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
         }
     }
 
+    @VisibleForTesting
     private fun prepareTempUri(): Uri {
         val timestamp = SimpleDateFormat("HHmmss").format(Date())
         val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -181,6 +203,7 @@ class ProfileFragment : BaseFragment<ProfileViewModel>() {
         return FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", tempFile)
     }
 
+    @VisibleForTesting
     private fun removeTempUri(payload: Uri?) {
         payload ?: return
         requireContext().contentResolver.delete(payload, null, null)

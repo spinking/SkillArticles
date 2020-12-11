@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 import android.provider.Settings
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -41,7 +42,8 @@ class ProfileViewModel(handle: SavedStateHandle) : BaseViewModel<ProfileState>(h
         }
     }
 
-    private fun startFormResult(action: PendingAction) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    private fun startForResult(action: PendingAction) {
         activityResult.value = Event(action)
     }
 
@@ -74,14 +76,14 @@ class ProfileViewModel(handle: SavedStateHandle) : BaseViewModel<ProfileState>(h
              val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.parse("package:ru.skillbranch.skillarticles")
             }
-            startFormResult(PendingAction.SettingsAction(intent))
+            startForResult(PendingAction.SettingsAction(intent))
         }
         notify(Notify.ErrorMessage("Need permissions for storage", "Open settings", errHandler))
     }
 
     private fun executePendingAction() {
         val pendingAction = currentState.pendingAction ?: return
-        startFormResult(pendingAction)
+        startForResult(pendingAction)
     }
 
     fun handleUploadPhoto(inputStream: InputStream?) {
