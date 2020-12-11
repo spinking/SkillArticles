@@ -43,7 +43,7 @@ class ProfileViewModel(handle: SavedStateHandle) : BaseViewModel<ProfileState>(h
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    private fun startForResult(action: PendingAction) {
+    fun startForResult(action: PendingAction) {
         activityResult.value = Event(action)
     }
 
