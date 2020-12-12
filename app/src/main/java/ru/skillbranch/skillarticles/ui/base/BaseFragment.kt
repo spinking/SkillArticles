@@ -15,7 +15,7 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     var _mockRoot: RootActivity? = null
     val root: RootActivity
-        get() = activity as RootActivity
+        get() = _mockRoot ?: activity as RootActivity
     open val binding: Binding? = null
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     abstract val viewModel: T
