@@ -21,6 +21,6 @@ fun String.isValidPassword(): Boolean {
 }
 
 fun String.isValidName(): Boolean {
-    val regex = "^[a-zA-Z0-9_-]{2,}\$".toRegex()
+    val regex = "^[a-zA-Z0-9_-]{3,}\$".toRegex()
     return regex.matches(this)
 }

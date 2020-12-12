@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.ui.auth
 
 import android.text.Spannable
+import android.util.TypedValue
 import androidx.annotation.VisibleForTesting
 import androidx.core.text.set
 import androidx.fragment.app.viewModels
@@ -50,7 +51,9 @@ class RegistrationFragment() : BaseFragment<AuthViewModel>() {
                 if (args.privateDestination == -1) null else args.privateDestination
             )
         }
-        val color = root.attrValue(R.attr.colorPrimary)
-        (tv_privacy.text as Spannable).let { it[0..it.length] = UnderlineSpan(color) }
+        val typedValue = TypedValue()
+        context?.theme?.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+        //val color = root.attrValue(R.attr.colorPrimary)
+        (tv_privacy.text as Spannable).let { it[0..it.length] = UnderlineSpan(typedValue.data) }
     }
 }
